@@ -1,8 +1,6 @@
 <template>
   <div id="app">
      <!-- As a heading -->
-    <link type="text/css" rel="stylesheet" href="css/annotorious.css" />
-    <script type="text/javascript" src="annotorious.min.js"></script>
     <div class="navbar">
         <img src="./assets/logo.png" class="logo" alt="Beaver">
         <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">

@@ -15,7 +15,7 @@
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}</p>
           <div class="thumbnail">
-            <img src="../assets/thumb1.jpg" class="annotatable"/>
+            <img src="../assets/thumb1.jpg"/>
           </div>
           <br>
         </li>
