@@ -1,12 +1,21 @@
 <template>
   <div id="LivingMemory">
+    <div class="searchBar">
+      <b-input-group size="lg" class="mb-3">
+        <b-form-input v-model="searchedKeyword"
+                      type="text"
+                      placeholder="Beaver for anything">
+        </b-form-input>
+        <b-btn size="lg" variant="success" v-on:click="filterSearch(searchedKeyword)">Go!</b-btn>
+      </b-input-group>
+    </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
-        <li class="memoryCell" v-for="memory in memories" :key="memory">
+        <li class="memoryCell" v-for="memory in filteredMemories" :key="memory.id">
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}</p>
           <div class="thumbnail">
-            <img src="../assets/thumb1.jpg"/>
+            <img src="../assets/thumb1.jpg" class="annotatable"/>
           </div>
           <br>
         </li>
@@ -22,22 +31,26 @@ export default {
   data() {
     return {
       memories: [],
+      filteredMemories: [],
+      searchedKeyword: '',
     };
   },
 
   // Setters here
   watch: {
     /* eslint-disable */
-    memories: function() {
+    filteredMemories: function() {
 
     }
   },
 
   // On Create here
   created() {
-    const memories = [{ title: 'Deneme1', 
+    const memories = [{ id: 1,
+                        title: 'Deneme1', 
                         description: 'Whish we could turn back time. To the gold old days' }, 
-                      { title: 'Deneme2',
+                      { id: 2,
+                        title: 'Deneme2',
                         description: 'When our momma sang us to sleep but now we’re stressed out' }]
     this.fillMemories(memories);
   },
@@ -46,9 +59,14 @@ export default {
   methods: {
     fillMemories(exampleMemories) {
       this.memories = exampleMemories
-    }
-  },
+    },
 
+    filterSearch(keyword) {
+      this.filteredMemories = this.memories.filter(memory => 
+        memory.title.toLowerCase().includes(keyword.toLowerCase()))
+      console.log(this.filteredMemories);
+    },
+  },
 };
 </script>
 
@@ -61,10 +79,9 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
-
-  grid-template: 1fr / 1fr;
-  grid-template-areas:
-    "memories"
+  grid-template:  ". searchBar ."  auto
+                  ". memories  ."  auto
+                  / 13% 1fr 13%;
 }
 
 .memories {
@@ -84,10 +101,8 @@ export default {
 }
 
 ul.memoryList li {
-  margin-left: 32px;
-  margin-right: 32px;
   padding: 8px;
-  background-color: #fff;
+  background-color: #ffffff00;
 }
 
 ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
@@ -118,9 +133,12 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .description {
   grid-area: description;
-  margin-left: 24px;
   margin-top: 24px;
+}
 
+.searchBar {
+  grid-area: searchBar;
+  margin-top: 24px
 }
 
 </style>

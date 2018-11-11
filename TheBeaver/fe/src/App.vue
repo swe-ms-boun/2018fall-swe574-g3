@@ -1,8 +1,15 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+     <!-- As a heading -->
+    <link type="text/css" rel="stylesheet" href="css/annotorious.css" />
+    <script type="text/javascript" src="annotorious.min.js"></script>
+    <div class="navbar">
+        <img src="./assets/logo.png" class="logo" alt="Beaver">
+        <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">
+        <div class="links">
+          <router-link to="/">Home</router-link> |
+          <router-link to="/about">About</router-link>
+        </div>
     </div>
     <router-view/>
   </div>
@@ -16,16 +23,17 @@
   text-align: center;
   color: #2c3e50;
 }
-#nav {
+
+#navbar {
   padding: 30px;
 }
 
-#nav a {
+.links a {
   font-weight: bold;
   color: #2c3e50;
 }
 
-#nav a.router-link-exact-active {
+.links a.router-link-exact-active {
   color: #42b983;
 }
 
@@ -43,5 +51,29 @@ li {
 }
 a {
   color: #42b983;
+}
+
+.navbar {
+  background: linear-gradient(to right,#ffffff , #ffffff);
+  height: 64px;
+  text-align: left;
+}
+
+.links {
+  text-align: right !important;
+  display: block;
+  align-self: right;
+}
+
+img.logo {
+  height: 64px !important;
+  align-items: left;
+  justify-content: left;
+}
+
+img.logo_text {
+  height: 64px !important;
+  align-items: left;
+  justify-content: left;
 }
 </style>
