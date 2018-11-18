@@ -1,5 +1,5 @@
 <template>
-  <div id="LivingMemory">
+  <div id="Profile">
     <div class="searchBar">
       <b-input-group size="lg" class="mb-3">
         <b-form-input v-model="searchedKeyword"
@@ -21,18 +21,35 @@
         </li>
       </ul>
     </div>
+    <div class="uploadImage">
+      <vue-core-image-upload
+        class="btn btn-primary"
+        :crop="false"
+        @imageuploaded="imageuploaded"
+        :data="data"
+        :max-file-size="5242880">
+      </vue-core-image-upload>
+       <img :src="this.uploadedImage"/>
+    </div>
   </div>
 </template>
 
 <script>
+
+import VueCoreImageUpload from 'vue-core-image-upload';
+
 export default {
-  name: 'LivingMemory',
+  components: {
+    'vue-core-image-upload': VueCoreImageUpload,
+  },
+  name: 'Profile',
   // Variables here
   data() {
     return {
       memories: [],
       filteredMemories: [],
       searchedKeyword: '',
+      uploadedImage: 'http://img1.vued.vanthink.cn/vued0a233185b6027244f9d43e653227439a.png',
     };
   },
 
@@ -62,11 +79,15 @@ export default {
     },
 
     filterSearch(keyword) {
-      debugger;
       this.filteredMemories = this.memories.filter(memory => 
         memory.title.toLowerCase().includes(keyword.toLowerCase()))
       console.log(this.filteredMemories);
     },
+    imageuploaded(res) {
+      if (res.errcode == 0) {
+        this.uploadedImage = res.data.src;
+      }
+    }
   },
 };
 </script>
@@ -74,7 +95,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 
-#LivingMemory {
+#Profile {
   display: grid;
   width: 100%;
   height: 100%;
@@ -82,6 +103,7 @@ export default {
   align-items: center;
   grid-template:  ". searchBar ."  auto
                   ". memories  ."  auto
+                  ". uploadImage    ."  auto
                   / 13% 1fr 13%;
 }
 
@@ -139,6 +161,11 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .searchBar {
   grid-area: searchBar;
+  margin-top: 24px
+}
+
+.uploadImage {
+  grid-area: uploadImage;
   margin-top: 24px
 }
 

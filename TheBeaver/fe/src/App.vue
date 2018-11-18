@@ -6,7 +6,7 @@
         <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">
         <div class="links">
           <router-link to="/">Home</router-link> |
-          <router-link to="/about">About</router-link>
+          <router-link to="/profile">Profile</router-link>
         </div>
     </div>
     <router-view/>
