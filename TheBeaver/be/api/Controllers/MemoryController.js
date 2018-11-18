@@ -1,7 +1,8 @@
 const config = require('../Config.js');
+Memory = require('../Models/Memory.js')
 
-exports.getAvailableMemories = (req,res) => {
-    config.twitterClients[0].get('memories/available', (error, memories, response) => {
-        return res.json(memories); 
+exports.getAvailableMemories = (req, res) => {
+    Memory.findMemories((err, memories) => {
+        res.json(memories);
     });
-}
+};
