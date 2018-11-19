@@ -20,6 +20,9 @@ app.use(bodyParser.json());
 const MongoClient = require('mongodb').MongoClient;
 
 const uri = "mongodb+srv://" + username + ":" + password + "@living-memory-tvs0t.mongodb.net/test?retryWrites=true"
+
+// MongoDB Connection
+/* 
 MongoClient.connect(uri, function (err, client) {
     if (err) {
         console.log('Error occurred while connecting to MongoDB Atlas...\n', err);
@@ -33,6 +36,17 @@ MongoClient.connect(uri, function (err, client) {
                 console.log(result);
     });
     client.close();
+});
+*/
+
+// Mongoose Connection
+
+mongoose.connect(uri)
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+    // we're connected!
+    console.log("connected...")
 });
 
 // Binding our routes with the server instance

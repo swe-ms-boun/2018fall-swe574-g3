@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+// Create the schema for the Memory database
 var memorySchema = mongoose.Schema({
     description: {
         type: String,
@@ -7,8 +8,10 @@ var memorySchema = mongoose.Schema({
     },
 });
 
-Memory = module.exports = mongoose.model('Memory', memorySchema);
+// Create a model for the schema
+const Memory = mongoose.model('Memory', memorySchema, 'memories');
+module.exports = Memory;
 
-module.exports.findMemories = (callback, limit) => {
-    Memory.find(callback).limit(limit)
+module.exports.getMemory = (callback) => {
+    Memory.find(callback)
 }
