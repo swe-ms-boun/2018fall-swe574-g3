@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 const MongoClient = require('mongodb').MongoClient;
 
-const uri = "mongodb+srv://" + username + ":" + password + "@living-memory-tvs0t.mongodb.net/test?retryWrites=true"
+const uri = "mongodb+srv://" + username + ":" + password + "@living-memory-tvs0t.mongodb.net/test?retryWrites=true/LivingMemory"
 
 // MongoDB Connection
 /* 
