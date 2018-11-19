@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'LivingMemory',
   // Variables here
@@ -33,6 +35,8 @@ export default {
       memories: [],
       filteredMemories: [],
       searchedKeyword: '',
+      baseURL: 'http://localhost:3001',
+      dbMemories: [],
     };
   },
 
@@ -45,14 +49,21 @@ export default {
   },
 
   // On Create here
-  created() {
-    const memories = [{ id: 1,
-                        title: 'Deneme1', 
-                        description: 'Whish we could turn back time. To the gold old days' }, 
-                      { id: 2,
-                        title: 'Deneme2',
-                        description: 'When our momma sang us to sleep but now we’re stressed out' }]
-    this.fillMemories(memories);
+  async created() {
+    await axios.get(`${this.baseURL}/memories`).then((res) => {
+       res.data.forEach((memory) => {
+          this.dbMemories.push({
+            description: memory.description,
+          })
+       })
+      const memories = [{ id: 1,
+                          title: 'Deneme1', 
+                          description: this.dbMemories[0].description }, 
+                        { id: 2,
+                          title: 'Deneme2',
+                          description: 'When our momma sang us to sleep but now we’re stressed out' }]
+      this.fillMemories(memories);
+    })
   },
 
   // Methods here
@@ -62,7 +73,6 @@ export default {
     },
 
     filterSearch(keyword) {
-      debugger;
       this.filteredMemories = this.memories.filter(memory => 
         memory.title.toLowerCase().includes(keyword.toLowerCase()))
       console.log(this.filteredMemories);
