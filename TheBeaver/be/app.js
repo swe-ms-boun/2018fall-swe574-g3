@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 const MongoClient = require('mongodb').MongoClient;
 
-const uri = "mongodb+srv://" + username + ":" + password + "@living-memory-tvs0t.mongodb.net/test?retryWrites=true/LivingMemory"
+const uri = "mongodb+srv://" + username + ":" + password + "@living-memory-tvs0t.mongodb.net/test?retryWrites=true"
 
 // MongoDB Connection
 /* 
@@ -40,13 +40,16 @@ MongoClient.connect(uri, function (err, client) {
 */
 
 // Mongoose Connection
+mongoose.Promise = global.Promise;
 
-mongoose.connect(uri)
+mongoose.connect(uri, {
+    dbName: 'LivingMemory'
+})
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
     // we're connected!
-    console.log("connected...")
+    console.log("connected..." + db.name)
 });
 
 // Binding our routes with the server instance
