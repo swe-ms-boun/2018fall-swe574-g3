@@ -7,4 +7,7 @@ module.exports = (app) => {
 
     app.route('/postMemory')
         .post(memoryController.postMemory)
+
+    app.route('/deleteMemory')
+        .delete(memoryController.deleteMemory)
 };

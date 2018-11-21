@@ -18,7 +18,11 @@
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
-        <li class="memoryCell" v-for="memory in memories" :key="memory.id">
+        <li class="memoryCell" v-for="memory in memories" :key="memory._id">
+          <b-button class="deleteButton"
+                    variant="danger"
+                    @click="deleteMemory(memory._id)">X
+          </b-button>
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}</p>
           <div class="thumbnail">
@@ -63,7 +67,6 @@ export default {
 
   // Methods here
   methods: {
-
     async getAllMemories() {
       this.memories = [];
       await axios.get(`${this.baseURL}/memories`).then((res) => {
@@ -71,27 +74,31 @@ export default {
           this.memories.push({
             description: memory.description,
             title: memory.title,
+            id: memory._id,
           })
        })
      });
     },
 
-    async postMemory() {
-      console.log(this.message);
-      await axios.post(`${this.baseURL}/postMemory`,{
-         description: this.message,
-         title: this.title,
-      })
-          .then(async (response) => {
-            console.log(response);
-            debugger;
-            this.getAllMemories();
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+  async postMemory() {
+    await axios.post(`${this.baseURL}/postMemory`,{
+        description: this.message,
+        title: this.title,
+    })
+        .then(async (response) => {
+          debugger;
+          this.getAllMemories();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
   },
+
+  async deleteMemory(id) {
+    axios.delete(`${this.baseURL}/deleteMemory`, { data: { _id: id} });
+  },
+
 };
 </script>
 
@@ -135,9 +142,10 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 .memoryCell {
   background-color: rgb(240, 240, 240) !important;
   display: grid;
-  grid-template: " thumbnail  title       " auto
-                 " thumbnail  description " auto
-                 / auto       1fr;
+  grid-template: " .          .           deleteButton " auto
+                 " thumbnail  title       .            " auto
+                 " thumbnail  description .           " auto
+                 / auto       1fr         auto;
   text-align: left;
 }
 
@@ -168,12 +176,10 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   grid-template: " thumbnail  editTitle       " 20%
                  " thumbnail  editDescription " auto
                  / 256px       auto;
-  margin-bottom: 48px;
 }
 
 .postMemory {
   grid-area: postMemory;
-  margin-top: 24px;
   display: grid;
   grid-template: " inputText  inputText     " auto
                  " .          postButton    " auto
@@ -194,5 +200,9 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   grid-area: editDescription;
   margin: 24px;
 
+}
+
+.deleteButton {
+  grid-area: deleteButton;
 }
 </style>
