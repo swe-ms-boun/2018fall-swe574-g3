@@ -21,7 +21,7 @@
         <li class="memoryCell" v-for="memory in memories" :key="memory._id">
           <b-button class="deleteButton"
                     variant="danger"
-                    @click="deleteMemory(memory._id)">X
+                    @click="deleteMemory(memory.id)">X
           </b-button>
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}</p>
@@ -69,35 +69,45 @@ export default {
   methods: {
     async getAllMemories() {
       this.memories = [];
-      await axios.get(`${this.baseURL}/memories`).then((res) => {
-       res.data.forEach((memory) => {
-          this.memories.push({
-            description: memory.description,
-            title: memory.title,
-            id: memory._id,
+      await axios.get(`${this.baseURL}/memories`)
+        .then((res) => {
+          res.data.forEach((memory) => {
+            this.memories.push({
+              description: memory.description,
+              title: memory.title,
+              id: memory._id,
+            })
           })
-       })
-     });
+        });
     },
 
-  async postMemory() {
-    await axios.post(`${this.baseURL}/postMemory`,{
-        description: this.message,
-        title: this.title,
-    })
+    async postMemory() {
+      await axios.post(`${this.baseURL}/postMemory`,{
+          description: this.message,
+          title: this.title,
+      })
         .then(async (response) => {
-          debugger;
           this.getAllMemories();
         })
         .catch(function (error) {
           console.log(error);
         });
-    }
-  },
+      },
 
-  async deleteMemory(id) {
-    axios.delete(`${this.baseURL}/deleteMemory`, { data: { _id: id} });
-  },
+    async deleteMemory(id) {
+      axios.delete(`${this.baseURL}/deleteMemory`, { 
+        data: {
+          id: id
+        }
+      })
+        .then(async (response) => {
+          this.getAllMemories();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    },
+  }
 
 };
 </script>

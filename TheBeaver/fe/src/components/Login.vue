@@ -77,8 +77,6 @@ export default {
     onSignInError(error) {
       console.log("OH NOES", error);
     }
-    /*  fillMemories(exampleMemories) {
-    this.memories = exampleMemories */
   }
 };
 </script>
