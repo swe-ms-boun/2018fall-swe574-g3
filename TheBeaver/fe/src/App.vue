@@ -1,7 +1,7 @@
 <template>
   <div id="app">
      <!-- As a heading -->
-    <b-navbar class="navbar">
+    <b-navbar class="navbar border border-dark border-top-0">
         <img src="./assets/logo.png" class="logo" alt="Beaver">
         <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">
         <div class="links">
@@ -54,7 +54,7 @@ a {
 }
 
 .navbar {
-  background: linear-gradient(to right,#fafafa , #ffffff);
+  background: linear-gradient(to right,#ffffff , #ffffff);
   height: 64px;
   text-align: left;
 }

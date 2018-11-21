@@ -131,6 +131,7 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .title {
   grid-area: title;
+  font-weight: bold;
 }
 
 .description {

@@ -144,19 +144,20 @@ export default {
 
 ul.memoryList li {
   padding: 8px;
-  background-color: #ffffff00;
 }
 
 ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
-  background-color: rgb(240, 240, 240) !important;
+  background-color: #fffdea36 !important;
   display: grid;
   grid-template: " .          .           deleteButton " auto
                  " thumbnail  title       .            " auto
-                 " thumbnail  description .           " auto
+                 " thumbnail  description .            " 80%
                  / auto       1fr         auto;
   text-align: left;
+  box-shadow: 3px 3px #0000001c;
+
 }
 
 .thumbnail img {
@@ -172,6 +173,7 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .title {
   grid-area: title;
+  font-weight: bold;
 }
 
 .description {
