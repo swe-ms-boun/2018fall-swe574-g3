@@ -15,7 +15,9 @@
     "vue": "^2.5.17",
     "vue-annotator": "^0.13.2",
     "vue-core-image-upload": "^2.4.11",
+    "vue-facebook-signin-button": "^1.0.1",
     "vue-router": "^3.0.1",
+    "vue-session": "^1.0.0",
     "vue-upload-image": "^1.1.0",
     "vuex": "^3.0.1",
     "webpack-merge": "^4.1.4"
