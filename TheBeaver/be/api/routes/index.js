@@ -4,4 +4,7 @@ module.exports = (app) => {
     
     app.route('/memories')
         .get(memoryController.getAvailableMemories)
+
+    app.route('/postMemory')
+        .post(memoryController.postMemory)
 };

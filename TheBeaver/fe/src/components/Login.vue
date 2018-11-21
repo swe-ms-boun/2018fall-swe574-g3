@@ -20,25 +20,24 @@ import Vue from 'vue';
 import VueSession from 'vue-session';
 
 Vue.use(FBSignInButton);
-Vue.use(VueSession)
+Vue.use(VueSession);
 
 export default {
-  name: "Profile",
+  name: 'Login',
   // Variables here
   data() {
     return {
       fbname: false,
       fbSignInParams: {
-        scope: "email",
-        return_scopes: true
-      }
+        scope: 'email',
+        return_scopes: true,
+      },
     };
   },
 
   // Setters here
   watch: {
     /* eslint-disable */
-    filteredMemories: function() {}
   },
 
   // On Create here

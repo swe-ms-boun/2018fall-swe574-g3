@@ -36,46 +36,37 @@ export default {
       filteredMemories: [],
       searchedKeyword: '',
       baseURL: 'http://localhost:3001',
-      dbMemories: [],
     };
   },
 
   // Setters here
   watch: {
     /* eslint-disable */
-    filteredMemories: function() {
 
-    }
   },
 
   // On Create here
   async created() {
-    await axios.get(`${this.baseURL}/memories`).then((res) => {
-       res.data.forEach((memory) => {
-          this.dbMemories.push({
-            description: memory.description,
-          })
-       })
-      const memories = [{ id: 1,
-                          title: 'Deneme1', 
-                          description: this.dbMemories[0].description }, 
-                        { id: 2,
-                          title: 'Deneme2',
-                          description: 'When our momma sang us to sleep but now we’re stressed out' }]
-      this.fillMemories(memories);
-    })
+    
   },
 
   // Methods here
   methods: {
-    fillMemories(exampleMemories) {
-      this.memories = exampleMemories
-    },
 
-    filterSearch(keyword) {
+    async filterSearch(keyword) {
+
+      this.memories = [];
+      await axios.get(`${this.baseURL}/memories`)
+        .then((res) => {
+          res.data.forEach((memory) => {
+              this.memories.push({
+                title: memory.title,
+                description: memory.description,
+              })
+          })
+       })
       this.filteredMemories = this.memories.filter(memory => 
         memory.title.toLowerCase().includes(keyword.toLowerCase()))
-      console.log(this.filteredMemories);
     },
   },
 };

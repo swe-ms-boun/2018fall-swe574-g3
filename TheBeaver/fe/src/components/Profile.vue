@@ -1,17 +1,24 @@
 <template>
   <div id="Profile">
-    <div class="searchBar">
-      <b-input-group size="lg" class="mb-3">
-        <b-form-input v-model="searchedKeyword"
+    <div class="postMemory">
+      <div class="inputText">
+        <div class="thumbnail">
+            <img src="../assets/thumb1.jpg"/>
+        </div>
+        <b-form-input class="editTitle"
                       type="text"
-                      placeholder="Beaver for anything">
-        </b-form-input>
-        <b-btn size="lg" variant="success" v-on:click="filterSearch(searchedKeyword)">Go!</b-btn>
-      </b-input-group>
+                      v-model="title"
+                      placeholder="Enter a title"/>
+        <b-form-textarea class="editDescription"
+                      type="text"
+                      v-model="message"
+                      placeholder="Enter your memory..."/>
+      </div>
+      <b-button class="postButton" v-on:click="postMemory">POST</b-button>
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
-        <li class="memoryCell" v-for="memory in filteredMemories" :key="memory.id">
+        <li class="memoryCell" v-for="memory in memories" :key="memory.id">
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}</p>
           <div class="thumbnail">
@@ -21,72 +28,68 @@
         </li>
       </ul>
     </div>
-    <div class="uploadImage">
-      <vue-core-image-upload
-        class="btn btn-primary"
-        :crop="false"
-        @imageuploaded="imageuploaded"
-        :data="data"
-        :max-file-size="5242880">
-      </vue-core-image-upload>
-       <img :src="this.uploadedImage"/>
-    </div>
   </div>
+
 </template>
 
 <script>
 
-import VueCoreImageUpload from 'vue-core-image-upload';
+import axios from 'axios';
 
 export default {
-  components: {
-    'vue-core-image-upload': VueCoreImageUpload,
-  },
+
   name: 'Profile',
   // Variables here
   data() {
     return {
       memories: [],
-      filteredMemories: [],
       searchedKeyword: '',
       uploadedImage: 'http://img1.vued.vanthink.cn/vued0a233185b6027244f9d43e653227439a.png',
+      message: '',
+      title: '',
+      baseURL: 'http://localhost:3001',
     };
   },
 
   // Setters here
   watch: {
     /* eslint-disable */
-    filteredMemories: function() {
-
-    }
   },
 
   // On Create here
-  created() {
-    const memories = [{ id: 1,
-                        title: 'Deneme1', 
-                        description: 'Whish we could turn back time. To the gold old days' }, 
-                      { id: 2,
-                        title: 'Deneme2',
-                        description: 'When our momma sang us to sleep but now we’re stressed out' }]
-    this.fillMemories(memories);
+  async created() {
+    await this.getAllMemories();
   },
 
   // Methods here
   methods: {
-    fillMemories(exampleMemories) {
-      this.memories = exampleMemories
+
+    async getAllMemories() {
+      this.memories = [];
+      await axios.get(`${this.baseURL}/memories`).then((res) => {
+       res.data.forEach((memory) => {
+          this.memories.push({
+            description: memory.description,
+            title: memory.title,
+          })
+       })
+     });
     },
 
-    filterSearch(keyword) {
-      this.filteredMemories = this.memories.filter(memory => 
-        memory.title.toLowerCase().includes(keyword.toLowerCase()))
-      console.log(this.filteredMemories);
-    },
-    imageuploaded(res) {
-      if (res.errcode == 0) {
-        this.uploadedImage = res.data.src;
-      }
+    async postMemory() {
+      console.log(this.message);
+      await axios.post(`${this.baseURL}/postMemory`,{
+         description: this.message,
+         title: this.title,
+      })
+          .then(async (response) => {
+            console.log(response);
+            debugger;
+            this.getAllMemories();
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
     }
   },
 };
@@ -101,9 +104,8 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
-  grid-template:  ". searchBar ."  auto
+  grid-template:  ". postMemory ."  auto
                   ". memories  ."  auto
-                  ". uploadImage    ."  auto
                   / 13% 1fr 13%;
 }
 
@@ -131,6 +133,7 @@ ul.memoryList li {
 ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
+  background-color: rgb(240, 240, 240) !important;
   display: grid;
   grid-template: " thumbnail  title       " auto
                  " thumbnail  description " auto
@@ -139,9 +142,8 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 }
 
 .thumbnail img {
-  width: 128px;
+  width: 256px;
   height: auto;
-  margin: 24px;
 }
 
 .thumbnail {
@@ -159,14 +161,38 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   margin-top: 24px;
 }
 
-.searchBar {
-  grid-area: searchBar;
-  margin-top: 24px
+.inputText {
+  grid-area: inputText;
+  margin-top: 24px;
+  display: grid;
+  grid-template: " thumbnail  editTitle       " 20%
+                 " thumbnail  editDescription " auto
+                 / 256px       auto;
+  margin-bottom: 48px;
 }
 
-.uploadImage {
-  grid-area: uploadImage;
-  margin-top: 24px
+.postMemory {
+  grid-area: postMemory;
+  margin-top: 24px;
+  display: grid;
+  grid-template: " inputText  inputText     " auto
+                 " .          postButton    " auto
+                 / auto       128px;
+  margin-bottom: 48px;
 }
 
+.postButton {
+  grid-area: postButton;
+}
+
+.editTitle {
+  grid-area: editTitle;
+  margin: 24px;
+}
+
+.editDescription {
+  grid-area: editDescription;
+  margin: 24px;
+
+}
 </style>
