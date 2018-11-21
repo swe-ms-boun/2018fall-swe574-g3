@@ -1,7 +1,7 @@
 <template>
   <div id="app">
      <!-- As a heading -->
-    <div class="navbar">
+    <b-navbar class="navbar">
         <img src="./assets/logo.png" class="logo" alt="Beaver">
         <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">
         <div class="links">
@@ -9,7 +9,7 @@
           <router-link to="/profile">Profile</router-link> |
           <router-link to="/login">Log In</router-link>
         </div>
-    </div>
+    </b-navbar>
     <router-view/>
   </div>
 </template>
@@ -54,7 +54,7 @@ a {
 }
 
 .navbar {
-  background: linear-gradient(to right,#ffffff , #ffffff);
+  background: linear-gradient(to right,#fafafa , #ffffff);
   height: 64px;
   text-align: left;
 }

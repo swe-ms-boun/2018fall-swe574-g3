@@ -14,7 +14,7 @@
                       v-model="message"
                       placeholder="Enter your memory..."/>
       </div>
-      <b-button class="postButton" v-on:click="postMemory">POST</b-button>
+      <b-button class="postButton" variant="success" v-on:click="postMemory">POST</b-button>
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
