@@ -24,7 +24,12 @@
                     @click="deleteMemory(memory.id)">X
           </b-button>
           <p class="title">{{ memory.title }}</p>
-          <p class="description">{{ memory.description }}</p>
+          <p class="description">{{ memory.description }}
+            <br><br>
+            Username: {{ memory.username }}
+            <br>
+            isPublic: {{ memory.isPublic }}
+          </p>
           <div class="thumbnail">
             <img src="../assets/thumb1.jpg"/>
           </div>
@@ -51,6 +56,8 @@ export default {
       uploadedImage: 'http://img1.vued.vanthink.cn/vued0a233185b6027244f9d43e653227439a.png',
       message: '',
       title: '',
+      isPublic: '',
+      username: '',
       baseURL: 'http://localhost:3001',
     };
   },
@@ -73,8 +80,10 @@ export default {
         .then((res) => {
           res.data.forEach((memory) => {
             this.memories.push({
+              username: memory.username,
               description: memory.description,
               title: memory.title,
+              isPublic: memory.isPublic,
               id: memory._id,
             })
           })
@@ -85,6 +94,8 @@ export default {
       await axios.post(`${this.baseURL}/postMemory`,{
           description: this.message,
           title: this.title,
+          username: JSON.parse(sessionStorage.getItem("vue-session-key")).session_username,
+          isPublic: true
       })
         .then(async (response) => {
           this.getAllMemories();

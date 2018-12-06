@@ -13,7 +13,12 @@
       <ul class="memoryList" id="memoryList">
         <li class="memoryCell" v-for="memory in filteredMemories" :key="memory.id">
           <p class="title">{{ memory.title }}</p>
-          <p class="description">{{ memory.description }}</p>
+          <p class="description">{{ memory.description }}<br>
+            <br>
+            Username: {{ memory.username }}
+            <br>
+            Public: {{memory.isPublic}}
+            </p>
           <div class="thumbnail">
             <img src="../assets/thumb1.jpg"/>
           </div>
@@ -62,6 +67,8 @@ export default {
               this.memories.push({
                 title: memory.title,
                 description: memory.description,
+                username: memory.username,
+                isPublic: memory.isPublic
               })
           })
        })
@@ -134,11 +141,20 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   font-weight: bold;
 }
 
+
 .description {
   grid-area: description;
   margin-top: 24px;
 }
+.username {
+  grid-row-start: username;
+  margin-top: 24px;
 
+}
+.isPublic {
+  grid-area: description;
+  margin-top: 24px;
+}
 .searchBar {
   grid-area: searchBar;
   margin-top: 24px

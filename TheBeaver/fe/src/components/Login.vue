@@ -20,24 +20,26 @@ import Vue from 'vue';
 import VueSession from 'vue-session';
 
 Vue.use(FBSignInButton);
-Vue.use(VueSession);
+Vue.use(VueSession)
 
 export default {
-  name: 'Login',
+  name: "Login",
   // Variables here
   data() {
     return {
-      fbname: false,
+      fbname:false,
+      fbpp,
       fbSignInParams: {
-        scope: 'email',
-        return_scopes: true,
-      },
+        scope: "email",
+        return_scopes: true
+      }
     };
   },
 
   // Setters here
   watch: {
     /* eslint-disable */
+    filteredMemories: function() {}
   },
 
   // On Create here
@@ -65,18 +67,23 @@ export default {
   methods: {
     onSignInSuccess(response) {
       FB.api("/me", dude => {
-        console.log(`Good to see you, ${dude.name}.`);
+        console.log(`Good to see you, ${dude.id}.`);
         this.fbname = dude.name;
+        this.fbpp = dude.id;
         console.log(this.fbname);
         this.$session.start();
         this.$session.set('session_username',this.fbname);
+        this.$session.set('settion_email',this.fbname);
         console.log(this.$session.getAll());
         this.fbname =true;
+
       });
     },
     onSignInError(error) {
       console.log("OH NOES", error);
     }
+    /*  fillMemories(exampleMemories) {
+    this.memories = exampleMemories */
   }
 };
 </script>
