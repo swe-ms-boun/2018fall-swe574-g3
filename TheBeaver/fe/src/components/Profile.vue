@@ -29,6 +29,8 @@
             Username: {{ memory.username }}
             <br>
             isPublic: {{ memory.isPublic }}
+            <br>
+            <a v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
           </p>
           <div class="thumbnail">
             <img src="../assets/thumb1.jpg"/>
@@ -59,6 +61,7 @@ export default {
       isPublic: '',
       username: '',
       baseURL: 'http://localhost:3001',
+      secondaryURL : 'http://localhost:8003',
     };
   },
 
