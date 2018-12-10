@@ -18,6 +18,8 @@ app_detail.use(BodyParser.urlencoded({ extended: true }));
 var database, collection;
 
 app_detail.listen(8003, () => {
+    annotations_list=[];
+    concatenated_string='';
     MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
         if (error) {
             throw error;
@@ -27,27 +29,35 @@ app_detail.listen(8003, () => {
         console.log('Connected to memories');
     }),
         app_detail.get("/post/:id", (req, res) => {
-            console.log(typeof req.params.id);
+            database.collection('annotations').find({ "body" : {'$regex' : req.params.id, '$options' : 'i'}})
+            .toArray((error_annotation, result_annotation) => {
+                if (error_annotation) {return res.status(500).send(error_annotation)};
+                result_annotation.forEach(function (element,i) {
+                    annotations_list.push(element.target.selector.value);
+                    concatenated_string+="\n var path = '"+annotations_list[i]+
+                    "'\n getElementByXPath(path).style.backgroundColor='yellow'\n";
+                });
+                
+           // console.log(typeof req.params.id)
+           // var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
             collection.findOne({ _id: new ObjectId(req.params.id)}, (error_detail, result_detail) => {
                 if (error_detail) {return res.status(500).send(error_detail)};
+                console.log(concatenated_string);
                 res.send(`
                     <html><body><h1>`+
                     result_detail["username"]+`
                     </h1><div><p>`+
                     result_detail["description"]+`
                     </p></div></body>
-                    <script>var getElementByXPath = function(a,b){b=document;return b.evaluate(a,b,null,9,null).singleNodeValue}
-                    var path = '//html[1]/body[1]/div[1]/p[1]/span[1]'
-                    getElementByXPath(path).style.backgroundColor='yellow'
-                    var path = '//html[1]/body[1]/div[1]/p[1]/span[2]'
-                    getElementByXPath(path).style.backgroundColor='yellow'
-                    var path = '//html[1]/body[1]/div[1]/p[1]/span[3]'
-                    getElementByXPath(path).style.backgroundColor='yellow'
-                    </script>
+                    <script>var getElementByXPath = function(a,b){b=document;return b.evaluate(a,b,null,9,null).singleNodeValue}`+
+                   concatenated_string+
+                    `</script>
                     </html>`
                     
-                    ); // çünkü obje olduğunu anlamıyor jövösökröpt inanılmaz... [" "] kullanımı zorunlu.
-
+                    )
+                    concatenated_string="";
+                     // çünkü obje olduğunu anlamıyor jövösökröpt inanılmaz... [" "] kullanımı zorunlu.
+                    
             }
-        )})
-});
+                    )})
+})})

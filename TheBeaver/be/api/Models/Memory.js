@@ -2,10 +2,13 @@ var mongoose = require('mongoose');
 
 // Create the schema for the Memory database
 var memorySchema = mongoose.Schema({
-    username:String,
+    username: String,
     title: String,
     description: String,
-    isPublic: Boolean
+    isPublic: Boolean,
+    taggedPeople: String,
+    location: String,
+    imgUrl: String,
 
 });
 

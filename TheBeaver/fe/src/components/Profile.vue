@@ -3,12 +3,24 @@
     <div class="postMemory">
       <div class="inputText">
         <div class="thumbnail">
-            <img src="../assets/thumb1.jpg"/>
+            <img :src= imgUrl style="width:230px; height:auto"/>
         </div>
         <b-form-input class="editTitle"
                       type="text"
                       v-model="title"
                       placeholder="Enter a title"/>
+        <b-form-input class="editTaggedPeople"
+                      type="text"
+                      v-model="taggedPeople"
+                      placeholder="Names to be tagged"/>
+        <b-form-input class="editLocation"
+                      type="text"
+                      v-model="location"
+                      placeholder="Enter a location"/>
+        <b-form-input class="editImage"
+                      type="text"
+                      v-model="imgUrl"
+                      placeholder="Image URL"/>
         <b-form-textarea class="editDescription"
                       type="text"
                       v-model="message"
@@ -28,21 +40,23 @@
             <br><br>
             Username: {{ memory.username }}
             <br>
-            isPublic: {{ memory.isPublic }}
+            <samp style="font-family:Avenir;"> Location: {{ memory.location }} </samp>
             <br>
-            <a v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
+            <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+            <br>
+            Public: {{ memory.isPublic }}
+            <br>
           </p>
+          <a class="view-annotations" v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
           <div class="thumbnail">
-            <img src="../assets/thumb1.jpg"/>
+            <img :src="memory.imgUrl"/>
           </div>
           <br>
         </li>
       </ul>
     </div>
   </div>
-
 </template>
-
 <script>
 
 import axios from 'axios';
@@ -60,8 +74,11 @@ export default {
       title: '',
       isPublic: '',
       username: '',
+      location: '',
+      imgUrl: '',
+      taggedPeople: '',
       baseURL: 'http://localhost:3001',
-      secondaryURL : 'http://localhost:8003',
+      secondaryURL: 'http://localhost:8003',
     };
   },
 
@@ -85,6 +102,9 @@ export default {
             this.memories.push({
               username: memory.username,
               description: memory.description,
+              imgUrl: memory.imgUrl,
+              taggedPeople : memory.taggedPeople,
+              location: memory.location,
               title: memory.title,
               isPublic: memory.isPublic,
               id: memory._id,
@@ -97,6 +117,9 @@ export default {
       await axios.post(`${this.baseURL}/postMemory`,{
           description: this.message,
           title: this.title,
+          imgUrl: this.imgUrl,
+          location: this.location, 
+          taggedPeople: this.taggedPeople,
           username: JSON.parse(sessionStorage.getItem("vue-session-key")).session_username,
           isPublic: true
       })
@@ -160,15 +183,16 @@ ul.memoryList li {
   padding: 8px;
 }
 
-ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
+ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
   background-color: #fffdea36 !important;
   display: grid;
-  grid-template: " .          .           deleteButton " auto
-                 " thumbnail  title       .            " auto
-                 " thumbnail  description .            " 80%
-                 / auto       1fr         auto;
+  grid-template: " .          .           .                 deleteButton " 12%
+                 " thumbnail  title       .                 .            " 7%
+                 " thumbnail  description .                 .            " 71%
+                 " thumbnail  .           view-annotations  .            " 10%
+                 / auto       1fr         auto              auto;
   text-align: left;
   box-shadow: 3px 3px #0000001c;
 
@@ -192,15 +216,23 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .description {
   grid-area: description;
-  margin-top: 24px;
+  margin-top: 10px;
+}
+.view-annotations {
+  grid-area: view-annotations;
+  margin-top: 10px;
+
 }
 
 .inputText {
   grid-area: inputText;
-  margin-top: 24px;
+  margin-top: 10px;
   display: grid;
-  grid-template: " thumbnail  editTitle       " 20%
-                 " thumbnail  editDescription " auto
+  grid-template: " thumbnail  editTitle        " 15%
+                 " thumbnail  editTaggedPeople " 15%
+                 " thumbnail  editLocation     " 15%
+                 " thumbnail  editImage        " 15%
+                 " thumbnail  editDescription  " auto
                  / 256px       auto;
 }
 
@@ -219,12 +251,31 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .editTitle {
   grid-area: editTitle;
-  margin: 24px;
+  margin: 15px;
+}
+
+.editImage {
+  grid-area: editImage;
+  margin: 15px;
+}
+
+.editLocation {
+  grid-area: editLocation;
+  margin: 15px;
+}
+
+.editLocation {
+  grid-area: editLocation;
+  margin: 15px;
+}
+.editTaggedPeople {
+  grid-area: editTaggedPeople;
+  margin: 15px;
 }
 
 .editDescription {
   grid-area: editDescription;
-  margin: 24px;
+  margin: 15px;
 
 }
 

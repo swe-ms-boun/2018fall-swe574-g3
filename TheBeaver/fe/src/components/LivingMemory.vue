@@ -17,11 +17,16 @@
             <br>
             Username: {{ memory.username }}
             <br>
+            <samp style="font-family:Avenir;"> Location: {{ memory.location }} </samp>
+            <br>
+            <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+            <br>
             Public: {{memory.isPublic}}
             </p>
           <div class="thumbnail">
-            <img src="../assets/thumb1.jpg"/>
+            <img :src="memory.imgUrl"/>
           </div>
+          <a class="view-annotations" v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
           <br>
         </li>
       </ul>
@@ -67,8 +72,11 @@ export default {
               this.memories.push({
                 title: memory.title,
                 description: memory.description,
+                location: memory.location,
+                taggedPeople: memory.taggedPeople,
                 username: memory.username,
-                isPublic: memory.isPublic
+                isPublic: memory.isPublic,
+                imgUrl: memory.imgUrl
               })
           })
        })
@@ -118,8 +126,9 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
   display: grid;
-  grid-template: " thumbnail  title       " auto
-                 " thumbnail  description " auto
+  grid-template: " thumbnail  title            " auto
+                 " thumbnail  description      " auto
+                 " thumbnail  view-annotations " auto
                  / auto       1fr;
   text-align: left;
 }
@@ -140,7 +149,10 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   grid-area: title;
   font-weight: bold;
 }
-
+.view-annotations {
+  grid-area: view-annotations;
+  margin-top: 24px;
+}
 
 .description {
   grid-area: description;
