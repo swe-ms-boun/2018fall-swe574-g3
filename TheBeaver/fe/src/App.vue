@@ -7,7 +7,7 @@
         <div class="links">
           <router-link to="/">Home</router-link> |
           <router-link to="/profile">Post</router-link> |
-          <router-link to="/login">Log In</router-link>
+          <router-link v-if="!this.$session.exists()" to="/login">Log In</router-link>
         </div>
     </b-navbar>
     <router-view/>

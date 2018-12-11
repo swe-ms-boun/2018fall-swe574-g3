@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       fbname:false,
-      fbpp,
+      fbpp: '',
       fbSignInParams: {
         scope: "email",
         return_scopes: true
@@ -69,11 +69,12 @@ export default {
       FB.api("/me", dude => {
         console.log(`Good to see you, ${dude.id}.`);
         this.fbname = dude.name;
-        this.fbpp = dude.id;
+        this.fbpp = 'https://graph.facebook.com/'+dude.id+'/picture?type=square';
         console.log(this.fbname);
         this.$session.start();
         this.$session.set('session_username',this.fbname);
-        this.$session.set('settion_email',this.fbname);
+        this.$session.set('session_email',this.fbname);
+        this.$session.set('session_fbpp', this.fbpp);
         console.log(this.$session.getAll());
         this.fbname =true;
 
