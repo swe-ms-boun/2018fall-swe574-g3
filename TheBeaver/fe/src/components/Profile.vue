@@ -36,7 +36,7 @@
                     @click="deleteMemory(memory.id)">X
           </b-button>
           <p class="title">{{ memory.title }}</p>
-          <p class="description">{{ memory.description }}
+          <p  v-html="memory.description" class="description">
             <br><br>
             Username: {{ memory.username }}
             <br>
