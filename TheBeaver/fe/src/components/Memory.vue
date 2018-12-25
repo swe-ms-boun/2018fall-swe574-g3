@@ -16,10 +16,10 @@
         <br>
         Public: {{ memory.isPublic }}
         <br>
-        </p>        
+        </p>
         <b-button class="annotate"
                 variant="info"
-                @click="getSelectedText()">Annotate
+                @click="annotate()">Annotate
         </b-button>
         <div class="thumbnail">
         <img :src="memory.imgUrl"/>
@@ -45,6 +45,7 @@ export default {
       annotatedText: '',
       id: '',
       baseURL: 'http://localhost:3001',
+      annotationURL: 'http://172.20.10.2:8004',
       annotationObject: {},
     };
   },
@@ -70,23 +71,31 @@ export default {
         })
     },
 
-    getSelectedText() {
-      if (window.getSelection) {
+    async annotate() {
+        if (window.getSelection) {
         this.annotatedText = window.getSelection().toString();
-      }
-      else if (document.selection) {
+        }
+        else if (document.selection) {
         this.annotatedText =  document.selection.createRange().text;
-      }
-      var annotationObject = {};
-          annotationObject = Object.assign({"@context": "http://www.w3.org/ns/anno.jsonld"}, annotationObject);
-          annotationObject = Object.assign({"id":1}, annotationObject);
-          annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
-          annotationObject = Object.assign({"created":new Date()}, annotationObject);
-          annotationObject = Object.assign({"creator":{"type":"Human","name":JSON.parse(sessionStorage["vue-session-key"])["session_username"]}}, annotationObject);
-          annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":"https://thebeaver.blabla/"}}, annotationObject);
-          annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
-          annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname, "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }}}, annotationObject);
-          this.annotationObject = annotationObject;
+        }
+        let annotationObject = {};
+        annotationObject = Object.assign({"@context": "http://www.w3.org/ns/anno.jsonld"}, annotationObject);
+        annotationObject = Object.assign({"id":1}, annotationObject);
+        annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
+        annotationObject = Object.assign({"created":new Date()}, annotationObject);
+        annotationObject = Object.assign({"creator":{"type":"Human","name":JSON.parse(sessionStorage["vue-session-key"])["session_username"]}}, annotationObject);
+        annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":"https://thebeaver.blabla/"}}, annotationObject);
+        annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
+        annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname, 
+                            "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }}}, annotationObject);
+        this.annotationObject = annotationObject;
+        await axios.post(`${this.annotationURL}/annotate`, { annotationObject }, 
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+            })
     },
   }
 }
