@@ -27,7 +27,7 @@
         </div>
         <br>
     </div>
-      <div id="debug" style="display:none"> {{ annotatedText }}</div>
+      <pre id="debug" style="display:none">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre>
   </div>
 </template>
 <script>
@@ -66,8 +66,6 @@ export default {
         .then((res) => {
             this.memory = res.data[0];
         })
-
-        debugger;
     },
 
     getSelectedText() {
