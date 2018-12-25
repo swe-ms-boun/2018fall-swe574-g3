@@ -4,7 +4,7 @@ const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectID;
 
 const CONNECTION_URL = "mongodb+srv://dbretriever:dbretriever@living-memory-tvs0t.mongodb.net/test?retryWrites=true";
-const DATABASE_NAME = "LivingMemory";
+const DATABASE_NAME = "BeaverAnnotation";
 const COLLECTION_NAME = "annotations"
 
 
@@ -34,8 +34,19 @@ app_detail.listen(8004, () => {
             database.collection('annotations').find({ "target.source": { '$regex': req.params['0'], '$options': 'i' } })
                 .toArray((error_annotation, result_annotation) => {
                     if (error_annotation) { return res.status(500).send(error_annotation) };
-                    res.jsonp(result_annotation)
+                    res.jsonp(result_annotation[0])
                 });
         }),
-        app_detail.post
+        app_detail.post("/annotate/", (req, res) => {
+            
+              then(item => {
+                res.send("item saved to database");
+                console.log(item);
+                console.log(req.body);
+
+              })
+              .catch(err => {
+                res.status(400).send(err);
+              });
+          });
 })
