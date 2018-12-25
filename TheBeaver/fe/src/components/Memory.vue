@@ -16,8 +16,7 @@
         <br>
         Public: {{ memory.isPublic }}
         <br>
-        </p>
-        <p class="annotatedText">{{ annotatedText }}</p>
+        </p>        
         <b-button class="annotate"
                 variant="info"
                 @click="getSelectedText()">Annotate
@@ -27,8 +26,10 @@
         </div>
         <br>
     </div>
-      <pre id="debug" style="display:none">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre>
+      <!-- <pre id="annot">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre> -->
+      <pre id="debug" style="display:none">{{ annotationObject }}</pre>
   </div>
+
 </template>
 <script>
 
@@ -44,6 +45,7 @@ export default {
       annotatedText: '',
       id: '',
       baseURL: 'http://localhost:3001',
+      annotationObject: {},
     };
   },
 
@@ -70,11 +72,21 @@ export default {
 
     getSelectedText() {
       if (window.getSelection) {
-          this.annotatedText = window.getSelection().toString();
+        this.annotatedText = window.getSelection().toString();
       }
       else if (document.selection) {
-          this.annotatedText =  document.selection.createRange().text;
+        this.annotatedText =  document.selection.createRange().text;
       }
+      var annotationObject = {};
+          annotationObject = Object.assign({"@context": "http://www.w3.org/ns/anno.jsonld"}, annotationObject);
+          annotationObject = Object.assign({"id":1}, annotationObject);
+          annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
+          annotationObject = Object.assign({"created":new Date()}, annotationObject);
+          annotationObject = Object.assign({"creator":{"type":"Human","name":JSON.parse(sessionStorage["vue-session-key"])["session_username"]}}, annotationObject);
+          annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":"https://thebeaver.blabla/"}}, annotationObject);
+          annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
+          annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname, "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }}}, annotationObject);
+          this.annotationObject = annotationObject;
     },
   }
 }
