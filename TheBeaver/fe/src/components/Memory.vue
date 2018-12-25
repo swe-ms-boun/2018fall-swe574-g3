@@ -81,7 +81,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 
 #Memory {
   display: grid;
@@ -100,7 +100,7 @@ export default {
   grid-template: " .          .             .                 deleteButton " 12%
                  " thumbnail  title         .                 .            " 7%
                  " thumbnail  description   .                 .            " 71%
-                 " thumbnail  annotatedText view-annotations  annotate     " 10%
+                 " thumbnail  annotatedText . annotate     " 10%
                  / auto       1fr           auto              auto;
   text-align: left; 
   box-shadow: 3px 3px #0000001c;
@@ -127,11 +127,6 @@ export default {
   grid-area: description;
   margin-top: 10px;
 }
-.view-annotations {
-  grid-area: view-annotations;
-  margin-top: 10px;
-
-}
 
 .annotate {
   grid-area: annotate;
@@ -141,6 +136,10 @@ export default {
 .annotatedText {
   grid-area: annotatedText;
   padding-bottom: 10px;
+}
+
+.deleteButton {
+  grid-area: deleteButton;
 }
 
 </style>

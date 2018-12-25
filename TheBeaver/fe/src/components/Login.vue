@@ -20,19 +20,19 @@ import Vue from 'vue';
 import VueSession from 'vue-session';
 
 Vue.use(FBSignInButton);
-Vue.use(VueSession)
+Vue.use(VueSession);
 
 export default {
-  name: "Login",
+  name: 'Login',
   // Variables here
   data() {
     return {
-      fbname:false,
+      fbname: false,
       fbpp: '',
       fbSignInParams: {
-        scope: "email",
-        return_scopes: true
-      }
+        scope: 'email',
+        return_scopes: true,
+      },
     };
   },
 
