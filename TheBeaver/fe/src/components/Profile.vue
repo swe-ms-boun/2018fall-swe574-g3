@@ -47,7 +47,14 @@
             Public: {{ memory.isPublic }}
             <br>
           </p>
-          <a class="view-annotations" v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
+          <p class="annotatedText">{{ annotatedText }}</p>
+          <router-link class="view-annotations"
+                       :to="{ name: 'Memory', params: { id: memory.id }}">View annotations
+          </router-link>
+           <b-button class="annotate"
+                    variant="info"
+                    @click="getSelectedText()">Annotate
+          </b-button>
           <div class="thumbnail">
             <img :src="memory.imgUrl"/>
           </div>
@@ -79,6 +86,7 @@ export default {
       taggedPeople: '',
       baseURL: 'http://localhost:3001',
       secondaryURL: 'http://localhost:8003',
+      annotatedText: '',
     };
   },
 
@@ -111,6 +119,15 @@ export default {
             })
           })
         });
+    },
+
+    getSelectedText() {
+      if (window.getSelection) {
+          this.annotatedText = window.getSelection().toString();
+      }
+      else if (document.selection) {
+          this.annotatedText =  document.selection.createRange().text;
+      }
     },
 
     async postMemory() {
@@ -191,7 +208,7 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
   grid-template: " .          .           .                 deleteButton " 12%
                  " thumbnail  title       .                 .            " 7%
                  " thumbnail  description .                 .            " 71%
-                 " thumbnail  .           view-annotations  .            " 10%
+                 " thumbnail  annotatedText      view-annotations  annotate     " 10%
                  / auto       1fr         auto              auto;
   text-align: left;
   box-shadow: 3px 3px #0000001c;
@@ -222,6 +239,16 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
   grid-area: view-annotations;
   margin-top: 10px;
 
+}
+
+.annotate {
+  grid-area: annotate;
+  padding-bottom: 10px;
+}
+
+.annotatedText {
+  grid-area: annotatedText;
+  padding-bottom: 10px;
 }
 
 .inputText {

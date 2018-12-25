@@ -9,7 +9,6 @@ var memorySchema = mongoose.Schema({
     taggedPeople: String,
     location: String,
     imgUrl: String,
-
 });
 
 // Create a model for the schema

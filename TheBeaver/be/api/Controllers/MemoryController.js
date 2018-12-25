@@ -11,6 +11,18 @@ exports.getAvailableMemories = (req, res) => {
     })
 };
 
+exports.getMemory = ((req, res) => {
+    Memory.find({
+        _id: req.params.id
+    })
+        .then((memory) => {
+            res.json(memory);
+        })
+        .catch(err => {
+            res.status(400).send("unable to get from database");
+        })
+});
+
 exports.postMemory = ((req, res) => {
     var myData = new Memory(req.body);
     myData.save()
