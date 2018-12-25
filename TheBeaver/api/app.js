@@ -1,7 +1,9 @@
-const Express = require("express");
+const Express = require("express"),
+            path = require('path');
 const BodyParser = require("body-parser");
 const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectID;
+
 
 const CONNECTION_URL = "mongodb+srv://dbretriever:dbretriever@living-memory-tvs0t.mongodb.net/test?retryWrites=true";
 const DATABASE_NAME = "LivingMemory";
@@ -9,7 +11,7 @@ const DATABASE_NAME = "LivingMemory";
 
 var app = Express();
 var app_detail = Express();
-
+app.use(Express.static(path.join(__dirname, 'public')));
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
 app_detail.use(BodyParser.json());
@@ -36,7 +38,9 @@ app_detail.listen(8003, () => {
                     annotations_list.push(element.target.selector.value);
                     concatenated_string+="\n var path = '"+annotations_list[i]+
                     "'\n getElementByXPath(path).style.backgroundColor='yellow'\n";
-                });
+                },
+                console.log(result_annotation));
+                
                 
            // console.log(typeof req.params.id)
            // var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
