@@ -45,7 +45,7 @@ export default {
       annotatedText: '',
       id: '',
       baseURL: 'http://localhost:3001',
-      annotationURL: 'http://172.20.10.2:8004',
+      annotationURL: 'http://localhost:8004',
       annotationObject: {},
     };
   },
@@ -83,7 +83,7 @@ export default {
         annotationObject = Object.assign({"id":1}, annotationObject);
         annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
         annotationObject = Object.assign({"created":new Date()}, annotationObject);
-        annotationObject = Object.assign({"creator":{"type":"Human","name":JSON.parse(sessionStorage["vue-session-key"])["session_username"]}}, annotationObject);
+        annotationObject = Object.assign({"creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"}}, annotationObject);
         annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":"https://thebeaver.blabla/"}}, annotationObject);
         annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
         annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname, 
