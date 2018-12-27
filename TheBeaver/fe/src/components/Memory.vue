@@ -82,9 +82,9 @@ export default {
         annotationObject = Object.assign({"@context": "http://www.w3.org/ns/anno.jsonld"}, annotationObject);
         annotationObject = Object.assign({"id":1}, annotationObject);
         annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
-        annotationObject = Object.assign({"created":new Date()}, annotationObject);
+        annotationObject = Object.assign({"created":new Date().toISOString()}, annotationObject);
         annotationObject = Object.assign({"creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"}}, annotationObject);
-        annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":"https://thebeaver.blabla/"}}, annotationObject);
+        annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host}}, annotationObject);
         annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
         annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname, 
                             "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }}}, annotationObject);
