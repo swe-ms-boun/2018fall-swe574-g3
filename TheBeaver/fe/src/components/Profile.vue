@@ -3,7 +3,9 @@
     <div class="postMemory">
       <div class="inputText">
         <div class="thumbnail">
-            <img :src= imgUrl style="width:230px; height:auto"/>
+            <img v-if="imgUrl" :src= imgUrl style="width:230px; height:auto"/>
+            <img v-else src= "https://cdn2.iconfinder.com/data/icons/sharpicons-photography/32/sharpicons_add-camera-512.png" style="width:230px; height:auto"/>
+
         </div>
         <b-form-input class="editTitle"
                       type="text"
@@ -47,14 +49,9 @@
             Public: {{ memory.isPublic }}
             <br>
           </p>
-          <p class="annotatedText">{{ annotatedText }}</p>
           <router-link class="view-annotations"
                        :to="{ name: 'Memory', params: { id: memory.id }}">View annotations
           </router-link>
-           <b-button class="annotate"
-                    variant="info"
-                    @click="getSelectedText()">Annotate
-          </b-button>
           <div class="thumbnail">
             <img :src="memory.imgUrl"/>
           </div>
@@ -97,15 +94,28 @@ export default {
 
   // On Create here
   async created() {
+
+    if(JSON.parse(sessionStorage.getItem("vue-session-key"))) {
+      this.username = JSON.parse(sessionStorage.getItem("vue-session-key")).session_username;
+    } else {
+      this.username = 'anonymous';
+    }
     await this.getAllMemories();
+
   },
 
   // Methods here
   methods: {
     async getAllMemories() {
       this.memories = [];
-      await axios.get(`${this.baseURL}/memories`)
-        .then((res) => {
+      if (this.username == 'anonymous') {
+        return;
+      }
+      await axios.get(`${this.baseURL}/memories`, {
+        params: {
+          username: this.username
+        }
+      }).then((res) => {
           res.data.forEach((memory) => {
             this.memories.push({
               username: memory.username,
@@ -121,23 +131,15 @@ export default {
         });
     },
 
-    getSelectedText() {
-      if (window.getSelection) {
-          this.annotatedText = window.getSelection().toString();
-      }
-      else if (document.selection) {
-          this.annotatedText =  document.selection.createRange().text;
-      }
-    },
-
     async postMemory() {
+
       await axios.post(`${this.baseURL}/postMemory`,{
           description: this.message,
           title: this.title,
           imgUrl: this.imgUrl,
-          location: this.location, 
+          location: this.location,
           taggedPeople: this.taggedPeople,
-          username: JSON.parse(sessionStorage.getItem("vue-session-key")).session_username,
+          username: this.username,
           isPublic: true
       })
         .then(async (response) => {
@@ -149,7 +151,7 @@ export default {
       },
 
     async deleteMemory(id) {
-      axios.delete(`${this.baseURL}/deleteMemory`, { 
+      axios.delete(`${this.baseURL}/deleteMemory`, {
         data: {
           id: id
         }
@@ -205,19 +207,19 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 .memoryCell {
   background-color: #fffdea36 !important;
   display: grid;
-  grid-template: " .          .           .                 deleteButton " 12%
-                 " thumbnail  title       .                 .            " 7%
-                 " thumbnail  description .                 .            " 71%
-                 " thumbnail  annotatedText      view-annotations  annotate     " 10%
-                 / auto       1fr         auto              auto;
+  grid-template: " .          .               .                 deleteButton " 1fr
+                 " thumbnail  title           .                 .            " auto
+                 " thumbnail  description     .                 .            " auto
+                 " thumbnail  annotatedText   view-annotations  .            " 1fr
+                 / auto       1fr             auto              auto;
   text-align: left;
   box-shadow: 3px 3px #0000001c;
-
 }
 
 .thumbnail img {
-  width: 256px;
+  width: 20vw;
   height: auto;
+  padding: 16px;
 }
 
 .thumbnail {
@@ -241,26 +243,16 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 
 }
 
-.annotate {
-  grid-area: annotate;
-  padding-bottom: 10px;
-}
-
-.annotatedText {
-  grid-area: annotatedText;
-  padding-bottom: 10px;
-}
-
 .inputText {
   grid-area: inputText;
   margin-top: 10px;
   display: grid;
-  grid-template: " thumbnail  editTitle        " 15%
-                 " thumbnail  editTaggedPeople " 15%
-                 " thumbnail  editLocation     " 15%
-                 " thumbnail  editImage        " 15%
-                 " thumbnail  editDescription  " auto
-                 / 256px       auto;
+  grid-template: " thumbnail         editTitle        " 15%
+                 " thumbnail         editTaggedPeople " 15%
+                 " thumbnail         editLocation     " 15%
+                 " thumbnail         editImage        " 15%
+                 " editDescription   editDescription  " auto
+                 / 256px             auto;
 }
 
 .postMemory {

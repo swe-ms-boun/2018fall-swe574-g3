@@ -11,6 +11,11 @@ var memorySchema = mongoose.Schema({
     imgUrl: String,
 });
 
+memorySchema.index({
+    '$**': 'text'
+});
+
+
 // Create a model for the schema
 const Memory = mongoose.model('Memory', memorySchema, 'memories');
 module.exports = Memory;

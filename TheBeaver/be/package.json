@@ -15,7 +15,8 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "mongodb": "^3.1.10",
-    "twitter": "^1.7.1",
-    "mongoose": "*"
+    "mongoose": "*",
+    "mongoose-searchable": "^1.0.0",
+    "twitter": "^1.7.1"
   }
 }

@@ -11,7 +11,7 @@
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
-        <li class="memoryCell" v-for="memory in filteredMemories" :key="memory.id">
+        <li class="memoryCell" v-for="memory in memories" :key="memory.id">
           <p class="title">{{ memory.title }}</p>
           <p class="description">{{ memory.description }}<br>
             <br>
@@ -26,7 +26,9 @@
           <div class="thumbnail">
             <img :src="memory.imgUrl"/>
           </div>
-          <a class="view-annotations" v-bind:href="'http://localhost:8003/post/'+memory.id" >View annotations..</a>
+          <router-link class="view-annotations"
+                       :to="{ name: 'Memory', params: { id: memory.id }}">View annotations
+          </router-link>
           <br>
         </li>
       </ul>
@@ -57,7 +59,7 @@ export default {
 
   // On Create here
   async created() {
-    
+
   },
 
   // Methods here
@@ -76,12 +78,13 @@ export default {
                 taggedPeople: memory.taggedPeople,
                 username: memory.username,
                 isPublic: memory.isPublic,
-                imgUrl: memory.imgUrl
+                imgUrl: memory.imgUrl,
+                id: memory._id,
               })
           })
        })
-      this.filteredMemories = this.memories.filter(memory => 
-        memory.title.toLowerCase().includes(keyword.toLowerCase()))
+      // this.filteredMemories = this.memories.filter(memory =>
+      //   memory.title.toLowerCase().includes(keyword.toLowerCase()))
     },
   },
 };
@@ -126,15 +129,18 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
   display: grid;
-  grid-template: " thumbnail  title            " auto
-                 " thumbnail  description      " auto
-                 " thumbnail  view-annotations " auto
-                 / auto       1fr;
+  background-color: #fffdea36 !important;
+  grid-template: " .          .                 .              .                      " 1fr
+                 " thumbnail  title             title          .                      " auto
+                 " thumbnail  description       description    .                      " auto
+                 " thumbnail  .                 .              view-annotations       " 1fr
+                 / auto       1fr               auto           auto;
   text-align: left;
+  box-shadow: 3px 3px #0000001c;
 }
 
 .thumbnail img {
-  width: 128px;
+  width: 20vw;
   height: auto;
   margin: 24px;
 }

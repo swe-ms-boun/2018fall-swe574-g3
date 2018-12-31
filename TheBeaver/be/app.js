@@ -41,6 +41,7 @@ MongoClient.connect(uri, function (err, client) {
 
 // Mongoose Connection
 mongoose.Promise = global.Promise;
+mongoose.set('useCreateIndex', true);
 
 mongoose.connect(uri, {
     dbName: 'LivingMemory'

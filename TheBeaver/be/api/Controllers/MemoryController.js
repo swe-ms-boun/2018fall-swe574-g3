@@ -1,8 +1,30 @@
 const config = require('../Config.js');
-Memory = require('../Models/Memory')
+Memory = require('../Models/Memory');
 
 exports.getAvailableMemories = (req, res) => {
-    Memory.find()
+    let query = {};
+    if (req.query.username) {
+        query.username = req.query.username;
+    }
+    if (req.query.keyword && req.query.keyword != '') {
+        let keyword = {
+            "$text": {
+                "$search": req.query.keyword
+            }
+        }
+        Memory.find(keyword, {
+            score: {
+                $meta: "textScore"
+            }
+        })
+        .then((memories) => {
+            res.json(memories);
+        }).catch((error) => {
+            res.status(400).send("unable to get from database");
+        });
+        return;
+    };
+    Memory.find(query)
     .then( (memories) => {
         res.json(memories);
     })
