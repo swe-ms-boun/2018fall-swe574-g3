@@ -1,13 +1,13 @@
 <template>
   <div id="app">
      <!-- As a heading -->
-    <b-navbar class="navbar border border-dark border-top-0">
-        <img src="./assets/logo.png" class="logo" alt="Beaver">
-        <img src="./assets/logo_text.png" class="logo_text" alt="Beaver">
+    <b-navbar class="navbar border-primary border-bottom">
+        <img src="./assets/new-logo.png" class="logo" alt="beaver">
         <div class="links">
           <router-link to="/">Home</router-link> |
           <router-link to="/profile">Post</router-link> |
           <router-link v-if="!this.$session.exists()" to="/login">Log In</router-link>
+          <router-link v-else to="/login">Sign out</router-link>
         </div>
     </b-navbar>
     <router-view/>
@@ -30,11 +30,11 @@
 
 .links a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #e7edf3;
 }
 
 .links a.router-link-exact-active {
-  color: #42b983;
+  color: #e6da70;
 }
 
 
@@ -54,7 +54,7 @@ a {
 }
 
 .navbar {
-  background: linear-gradient(to right,#ffffff , #ffffff);
+  background: #3B8AC0;
   height: 64px;
   text-align: left;
 }
@@ -71,7 +71,7 @@ img.logo {
   justify-content: left;
 }
 
-img.logo_text {
+img.logo-text {
   height: 64px !important;
   align-items: left;
   justify-content: left;

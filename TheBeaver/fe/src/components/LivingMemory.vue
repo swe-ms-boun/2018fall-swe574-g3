@@ -4,27 +4,37 @@
       <b-input-group size="lg" class="mb-3">
         <b-form-input v-model="searchedKeyword"
                       type="text"
-                      placeholder="Beaver for anything">
+                      placeholder="Beaver for memories">
         </b-form-input>
         <b-btn size="lg" variant="success" v-on:click="filterSearch(searchedKeyword)">Go!</b-btn>
       </b-input-group>
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
-        <li class="memoryCell" v-for="memory in memories" :key="memory.id">
+        <li class="memoryCell" v-for="memory in filteredMemories" :key="memory.id">
           <p class="title">{{ memory.title }}</p>
-          <p class="description">{{ memory.description }}<br>
+          <div class="description">
+            {{ memory.description }}
             <br>
-            Username: {{ memory.username }}
             <br>
-            <samp style="font-family:Avenir;"> Location: {{ memory.location }} </samp>
-            <br>
-            <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
-            <br>
-            Public: {{memory.isPublic}}
-            </p>
+            <div v-if="memory.username">
+            User: {{ memory.username }}
+            </div>
+            <div v-if="memory.location">
+              <samp  style="font-family:Avenir;">
+                Location: {{ memory.location }}
+              </samp>
+            </div>
+            <div v-if="memory.taggedPeople">
+              <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+            </div>
+            <div v-if="memory.isPublic">
+              Public: {{memory.isPublic}}
+            </div>
+          </div>
           <div class="thumbnail">
-            <img :src="memory.imgUrl"/>
+             <img v-if="memory.imgUrl" :src="memory.imgUrl"/>
+            <img v-else src= "http://savings.gov.pk/wp-content/plugins/ldd-directory-lite/public/images/noimage.png"/>
           </div>
           <router-link class="view-annotations"
                        :to="{ name: 'Memory', params: { id: memory.id }}">View annotations
@@ -45,46 +55,45 @@ export default {
   data() {
     return {
       memories: [],
-      filteredMemories: [],
       searchedKeyword: '',
       baseURL: 'http://localhost:3001',
     };
   },
 
-  // Setters here
-  watch: {
-    /* eslint-disable */
-
+  created() {
+    this.filterSearch();
   },
 
-  // On Create here
-  async created() {
+  // Setters here
+  computed: {
+    filteredMemories() {
+      return this.memories.filter(memory =>
+        JSON.stringify(memory).toLowerCase().includes(this.searchedKeyword.toLowerCase()));
+    },
 
   },
 
   // Methods here
   methods: {
 
-    async filterSearch(keyword) {
-
+    async filterSearch() {
       this.memories = [];
       await axios.get(`${this.baseURL}/memories`)
         .then((res) => {
           res.data.forEach((memory) => {
-              this.memories.push({
-                title: memory.title,
-                description: memory.description,
-                location: memory.location,
-                taggedPeople: memory.taggedPeople,
-                username: memory.username,
-                isPublic: memory.isPublic,
-                imgUrl: memory.imgUrl,
-                id: memory._id,
-              })
-          })
-       })
-      // this.filteredMemories = this.memories.filter(memory =>
-      //   memory.title.toLowerCase().includes(keyword.toLowerCase()))
+            this.memories.push({
+              title: memory.title,
+              description: memory.description,
+              location: memory.location,
+              taggedPeople: memory.taggedPeople,
+              username: memory.username,
+              isPublic: memory.isPublic,
+              imgUrl: memory.imgUrl,
+              // eslint-disable-next-line
+              id: memory._id,
+            });
+          });
+        });
     },
   },
 };
@@ -95,6 +104,7 @@ export default {
 
 #LivingMemory {
   display: grid;
+  background-image: linear-gradient(to top,#f7e3d888 , #ced7f088);
   width: 100%;
   height: 100%;
   justify-content: center;
@@ -129,14 +139,14 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
   display: grid;
-  background-color: #fffdea36 !important;
-  grid-template: " .          .                 .              .                      " 1fr
+  background-color: #ffffffbb !important;
+  grid-template: " .          .                 .              .                      " 36px
                  " thumbnail  title             title          .                      " auto
                  " thumbnail  description       description    .                      " auto
-                 " thumbnail  .                 .              view-annotations       " 1fr
+                " thumbnail   .                 .              view-annotations       " 1fr
                  / auto       1fr               auto           auto;
   text-align: left;
-  box-shadow: 3px 3px #0000001c;
+  box-shadow: 8px 8px #00000017;
 }
 
 .thumbnail img {

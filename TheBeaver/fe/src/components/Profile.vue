@@ -4,7 +4,7 @@
       <div class="inputText">
         <div class="thumbnail">
             <img v-if="imgUrl" :src= imgUrl style="width:230px; height:auto"/>
-            <img v-else src= "https://cdn2.iconfinder.com/data/icons/sharpicons-photography/32/sharpicons_add-camera-512.png" style="width:230px; height:auto"/>
+            <img v-else src="http://savings.gov.pk/wp-content/plugins/ldd-directory-lite/public/images/noimage.png" style="width:230px; height:auto"/>
 
         </div>
         <b-form-input class="editTitle"
@@ -38,22 +38,32 @@
                     @click="deleteMemory(memory.id)">X
           </b-button>
           <p class="title">{{ memory.title }}</p>
-          <p  v-html="memory.description" class="description">
-            <br><br>
-            Username: {{ memory.username }}
+         <div class="description">
+            {{ memory.description }}
             <br>
-            <samp style="font-family:Avenir;"> Location: {{ memory.location }} </samp>
             <br>
-            <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
-            <br>
-            Public: {{ memory.isPublic }}
-            <br>
-          </p>
+            <div v-if="memory.location">
+              <samp  style="font-family:Avenir;">
+                Location: {{ memory.location }}
+              </samp>
+            </div>
+            <div v-if="memory.taggedPeople">
+              <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+            </div>
+            <div v-if="memory.isPublic">
+              Public: {{memory.isPublic}}
+            </div>
+          </div>
+          <div class="thumbnail">
+            <img :src="memory.imgUrl"/>
+          </div>
           <router-link class="view-annotations"
                        :to="{ name: 'Memory', params: { id: memory.id }}">View annotations
           </router-link>
+
           <div class="thumbnail">
-            <img :src="memory.imgUrl"/>
+            <img v-if="memory.imgUrl" :src="memory.imgUrl"/>
+            <img v-else src= "http://savings.gov.pk/wp-content/plugins/ldd-directory-lite/public/images/noimage.png"/>
           </div>
           <br>
         </li>
@@ -173,6 +183,7 @@ export default {
 
 #Profile {
   display: grid;
+  background-image: linear-gradient(to top,#f7e3d888 , #ced7f088);
   width: 100%;
   height: 100%;
   justify-content: center;
@@ -205,12 +216,12 @@ ul.memoryList li {
 ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 
 .memoryCell {
-  background-color: #fffdea36 !important;
+  background-color: #ffffffbb !important;
   display: grid;
-  grid-template: " .          .               .                 deleteButton " 1fr
+  grid-template: " .          .               .                 deleteButton " 36px
                  " thumbnail  title           .                 .            " auto
                  " thumbnail  description     .                 .            " auto
-                 " thumbnail  annotatedText   view-annotations  .            " 1fr
+                 " thumbnail  .               view-annotations  .            " 1fr
                  / auto       1fr             auto              auto;
   text-align: left;
   box-shadow: 3px 3px #0000001c;
@@ -239,8 +250,7 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 }
 .view-annotations {
   grid-area: view-annotations;
-  margin-top: 10px;
-
+  bottom: 10px;
 }
 
 .inputText {
@@ -301,4 +311,14 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 .deleteButton {
   grid-area: deleteButton;
 }
+
+.links.view-annotations a  {
+  font-weight: bold;
+  color: #e7edf3;
+}
+
+.links.view-annotations a.router-link-exact-active  {
+  color: #e6da70;
+}
+
 </style>

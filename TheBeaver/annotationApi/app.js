@@ -33,7 +33,7 @@ app_detail.listen(8004, () => {
         collection = database.collection(COLLECTION_NAME);
         console.log('Connected to ' + COLLECTION_NAME);
     }),
-        app_detail.get("/annotation/*", (req, res) => {
+        app_detail.get("/getAnnotations/*", (req, res) => {
             console.log(req.params);
             database.collection('annotations').find({ "target.source": { '$regex': req.params['0'], '$options': 'i' } })
                 .toArray((error_annotation, result_annotation) => {
@@ -49,7 +49,7 @@ app_detail.listen(8004, () => {
 
                 });
             } catch (e) {
-                
+
                 console.log(e);
             }
             res.send(annotation);

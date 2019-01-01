@@ -20,6 +20,7 @@
     "vue-facebook-signin-button": "^1.0.1",
     "vue-router": "^3.0.1",
     "vue-session": "^1.0.0",
+    "vue-text-highlight": "^1.1.2",
     "vue-upload-image": "^1.1.0",
     "vuex": "^3.0.1",
     "webpack-merge": "^4.1.4"

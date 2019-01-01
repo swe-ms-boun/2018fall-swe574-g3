@@ -1,45 +1,70 @@
 <template>
+<div>
   <div id="Memory">
     <div class="memoryCell">
         <p class="title">{{ memory.title }}</p>
-        <p  v-html="memory.description" class="description">
-        <br><br>
-        Username: {{ memory.username }}
-        <br>
-        <samp style="font-family:Avenir;"> Location: {{ memory.location }} </samp>
-        <br>
-        <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
-        <br>
-        Public: {{ memory.isPublic }}
-        <br>
-        </p>
+        <!-- <p v-html="memory.description"> -->
+        <div class="description">
+          <text-highlight
+            :queries="queries">
+            {{ memory.description }}
+          </text-highlight>
+          <br><br>
+          <text-highlight :queries="queries">
+          Username: {{ memory.username }}
+          </text-highlight>
+          <br>
+          <text-highlight :queries="queries">
+          Location: {{ memory.location }}
+          </text-highlight>
+          <br>
+          <text-highlight :queries="queries">
+          People: {{ memory.taggedPeople }}
+          </text-highlight>
+          <br>
+        </div>
+        <!-- </p> -->
         <b-button class="annotate"
                 variant="info"
                 @click="annotate()">Annotate
         </b-button>
         <div class="thumbnail">
           <memory-img @anno-rect-changed="annoRectChanged"
+                      @photo-loaded="photoLoaded"
                       v-if="memory.imgUrl"
-                      :img-url="memory.imgUrl"/>
+                      :img-url="memory.imgUrl"
+                      ref="memoryImage">
+            <annotation-rect :position="annotationImageRect"></annotation-rect>
+            <annotation-rect
+              v-for="annotation in imageAnnotations"
+              :key="annotation.id"
+              :position="annotation.rect"
+              v-if="annotation.rect"
+            >
+            </annotation-rect>
+          </memory-img>
         </div>
         <br>
     </div>
-      <!-- <pre id="annot">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre> -->
-      <pre id="debug" style="display:none">{{ annotationTextObject }}</pre>
+    <!-- <pre id="annot">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre> -->
+    <pre id="debug" style="display:none">{{ annotationTextObject }}</pre>
   </div>
-
+</div>
 </template>
 <script>
 
 import axios from 'axios';
+import TextHighlight from 'vue-text-highlight';
 import MemoryImg from './MemoryImg.vue';
+import AnnotationRect from './AnnotationRect.vue';
 
 export default {
-
   name: 'Memory',
   // Variables here
   components: {
     MemoryImg,
+    AnnotationRect,
+    TextHighlight,
   },
 
   data() {
@@ -49,7 +74,10 @@ export default {
       id: '',
       baseURL: 'http://localhost:3001',
       annotationURL: 'http://localhost:8004',
+      annotations: [],
+      annotationImageRectRatio: {},
       annotationImageRect: {},
+      isPhotoLoaded: false,
     };
   },
 
@@ -57,6 +85,7 @@ export default {
   async created() {
     this.id = this.$attrs.id;
     this.getMemory();
+    this.getAnnotations();
   },
 
   // Setters here
@@ -83,7 +112,7 @@ export default {
     },
 
     annotationImageObject() {
-      if (!this.annotationImageRect) {
+      if (!this.annotationImageRectRatio) {
         return {};
       }
       let annotationObject = {"@context": "http://www.w3.org/ns/anno.jsonld",
@@ -93,15 +122,52 @@ export default {
       "generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host},
       "motivation":"tagging",
       "target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname,
-                          "selector":{"type": "ImageSelector", "rect" : this.annotationImageRect}}
+                          "selector":{"type": "ImageSelector", "rect" : this.annotationImageRectRatio}}
       };
       return annotationObject;
-    }
-  },
+    },
+
+    textAnnotations() {
+      return this.annotations.filter(annotation => annotation.target.selector.type === 'TextQuoteSelector');
+    },
+
+    imageAnnotations() {
+      return this.annotations
+              .filter(annotation => annotation.target.selector.type === 'ImageSelector')
+              .map(annotation => {
+                if (!this.isPhotoLoaded || !this.$refs.memoryImage) { return annotation };
+                const { width: imageWidth, height: imageHeight} = this.$refs.memoryImage.$refs.image.getBoundingClientRect();
+                return {
+                  id: annotation._id,
+                  rect: this.getAbsoluteRect({
+                    rect: annotation.target.selector.rect,
+                    imageWidth,
+                    imageHeight,
+                  })
+                }
+              })
+    },
+
+    queries() {
+      return this.textAnnotations.map(annotation => annotation.target.selector.exact);
+    },
+   },
 
 
   // Methods here
   methods: {
+
+    photoLoaded() {
+      // setInterval is necessary to ensure browser paints
+      // the image, b/c img onload does not take paint into acccount
+      // when being fired;
+      const resetInterval = setInterval(() => {
+        if (this.$refs.memoryImage.$refs) {
+          this.isPhotoLoaded = true;
+          clearInterval(resetInterval);
+        }
+      }, 100);
+    },
 
     async getMemory() {
         await axios.get(`${this.baseURL}/memory/${this.id}`)
@@ -110,12 +176,37 @@ export default {
         })
     },
 
+    async getAnnotations() {
+      await axios.get(`${this.annotationURL}/getAnnotations/${window.location.protocol+"//"+window.location.host+window.location.pathname}`)
+      .then(res => {
+        this.annotations = res.data;
+        console.log(this.annotations);
+      })
+    },
+
+    getAbsoluteRect({rect, imageWidth, imageHeight}) {
+      let {x, y, width, height} = rect;
+      x *= imageWidth;
+      width *= imageWidth;
+      y *= imageHeight;
+      height *= imageHeight;
+      return {x, y, width, height};
+    },
+
     annoRectChanged(annoRect) {
-      this.annotationImageRect = annoRect;
+      this.annotationImageRectRatio = annoRect;
+      if (!this.$refs.memoryImage) { return ; };
+      const { width: imageWidth, height: imageHeight} = this.$refs.memoryImage.$refs.image.getBoundingClientRect();
+      this.annotationImageRect = this.getAbsoluteRect({
+        rect: this.annotationImageRectRatio,
+        imageWidth,
+        imageHeight,
+      });
     },
 
     getTextAnnotation() {
       if (window.getSelection) {
+        if (window.getSelection().toString() === ' ') { return; };
         this.annotatedText = window.getSelection().toString();
       }
       else if (document.selection) {
@@ -135,12 +226,9 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           });
-        console.log(res.data);
       }
 
       if (this.annotationImageObject) {
-        console.log(this.annotationImageObject);
-        return;
         const res = await axios.post(
           `${this.annotationURL}/annotate`, {annotationObject: this.annotationImageObject},
           {
@@ -148,8 +236,9 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           });
-        console.log(res.data);
       }
+
+      await this.getAnnotations();
     },
   }
 }
@@ -164,23 +253,23 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
-  grid-template:  " . memoryCell  . "  auto
-                  / 13% 1fr 13%;
+  grid-template:  " .     .           . "  10%
+                  " .     memoryCell  . "  auto
+                  / 13%   1fr         13%;
 }
 
 .memoryCell {
   grid-area: memoryCell;
-  background-color: #fffdea36 !important;
   display: grid;
   grid-template: " .          .             .          .            " auto
                  " thumbnail  title         .          .            " auto
                  " thumbnail  description   .          .            " auto
-                 " thumbnail  annotatedText annotate   annotate     " auto
+                 " thumbnail  .             annotate   annotate     " auto
                  / auto       1fr           auto       auto;
   text-align: left;
-  box-shadow: 3px 3px #0000001c;
 
 }
+
 /*
 .thumbnail img {
   width: 256px;
@@ -206,11 +295,6 @@ export default {
 
 .annotate {
   grid-area: annotate;
-  padding-bottom: 10px;
-}
-
-.annotatedText {
-  grid-area: annotatedText;
   padding-bottom: 10px;
 }
 

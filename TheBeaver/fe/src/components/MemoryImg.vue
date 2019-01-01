@@ -1,26 +1,22 @@
 <template>
-    <div>
+    <div style="position: relative">
         <img :src="imgUrl"
-        class="IMAGE"
-        @dragstart.prevent
-        @mousedown="mousedownHandler"
-        @mousemove="mousemoveHandler"
-        @mouseup="mouseupHandler">
-        <annotation-rect :position="annotationRectangle"></annotation-rect>
+          class="IMAGE"
+          ref="image"
+          @dragstart.prevent
+          @mousedown="mousedownHandler"
+          @mousemove="mousemoveHandler"
+          @mouseup="mouseupHandler"
+          @load="$emit('photo-loaded')">
+        <slot/>
     </div>
 </template>
 
 
 <script>
 
-import AnnotationRect from './AnnotationRect.vue';
-
 export default {
   name: 'MemoryImg',
-
-  components: {
-    AnnotationRect,
-  },
   // Variables here
   data() {
     return {
@@ -43,36 +39,43 @@ export default {
       const {
         startX, startY, endX, endY,
       } = this;
+      const boundingRect = this.$refs.image.getBoundingClientRect();
+      const imageHeight = boundingRect.height;
+      const imageWidth = boundingRect.width;
 
       return {
-        width: Math.abs(startX - endX),
-        height: Math.abs(startY - endY),
-        x: Math.min(startX, endX),
-        y: Math.min(startY, endY),
+        width: Math.abs(startX - endX) / imageWidth,
+        x: Math.min(startX, endX) / imageWidth,
+        height: Math.abs(startY - endY) / imageHeight,
+        y: Math.min(startY, endY) / imageHeight,
       };
     },
   },
   methods: {
     mousedownHandler(event) {
-      const { clientX, clientY } = event;
+      const { offsetX, offsetY } = event;
       this.isTracking = true;
       this.endX = undefined;
       this.endY = undefined;
-      this.startX = clientX;
-      this.startY = clientY;
+      this.startX = offsetX;
+      this.startY = offsetY;
     },
     mousemoveHandler(event) {
       if (this.isTracking) {
-        const { clientX, clientY } = event;
-        this.endX = clientX;
-        this.endY = clientY;
+        const { offsetX, offsetY } = event;
+        this.endX = offsetX;
+        this.endY = offsetY;
+        this.updateRect();
       }
     },
     mouseupHandler(event) {
-      const { clientX, clientY } = event;
+      const { offsetX, offsetY } = event;
       this.isTracking = false;
-      this.endX = clientX;
-      this.endY = clientY;
+      this.endX = offsetX;
+      this.endY = offsetY;
+      this.updateRect();
+    },
+    updateRect() {
       this.$emit('anno-rect-changed', this.annotationRectangle);
     },
   },
