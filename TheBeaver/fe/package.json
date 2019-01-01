@@ -1,12 +1,13 @@
 {
-  "name": "fe",
+  "name": "beaver",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "deploy": "npm run build && now --public && now alias"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -23,7 +24,8 @@
     "vue-text-highlight": "^1.1.2",
     "vue-upload-image": "^1.1.0",
     "vuex": "^3.0.1",
-    "webpack-merge": "^4.1.4"
+    "webpack-merge": "^4.1.4",
+    "serve": "^9.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.5",

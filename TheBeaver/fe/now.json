@@ -1,0 +1,16 @@
+{
+  "name": "the-beaver-app",
+  "type": "static",
+  "static": {
+    "public": "dist",
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }]
+  },
+  "version":1,
+  "alias": "thebeaver",
+  "files": [
+    "dist"
+  ]
+}

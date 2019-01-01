@@ -91,8 +91,8 @@ export default {
       location: '',
       imgUrl: '',
       taggedPeople: '',
-      baseURL: 'http://localhost:3001',
-      secondaryURL: 'http://localhost:8003',
+      baseURL: 'https://beaver-memories.now.sh',
+      secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
     };
   },

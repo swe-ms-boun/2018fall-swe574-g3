@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "name": "memories-api",
+  "builds": [{
+    "src": "app.js",
+    "use": "@now/node-server"
+  }],
+  "alias": "beaver-memories",
+"routes": [{
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
+  },
+  "src": "/.*",
+  "dest": "/app.js"
+}]
+}
