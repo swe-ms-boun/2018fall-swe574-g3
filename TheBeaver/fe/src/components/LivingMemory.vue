@@ -18,15 +18,13 @@
             <br>
             <br>
             <div v-if="memory.username">
-            User: {{ memory.username }}
+              User: {{ memory.username }}
             </div>
             <div v-if="memory.location">
-              <samp  style="font-family:Avenir;">
-                Location: {{ memory.location }}
-              </samp>
+              Location: {{ memory.location }}
             </div>
             <div v-if="memory.taggedPeople">
-              <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+              People: {{ memory.taggedPeople }}
             </div>
             <div v-if="memory.isPublic">
               Public: {{memory.isPublic}}

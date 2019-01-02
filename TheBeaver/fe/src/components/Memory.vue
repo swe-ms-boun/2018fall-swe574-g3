@@ -5,22 +5,28 @@
         <p class="title">{{ memory.title }}</p>
         <!-- <p v-html="memory.description"> -->
         <div class="description">
-          <text-highlight
-            :queries="queries">
-            {{ memory.description }}
-          </text-highlight>
+          <Highlighter :searchWords="queries"
+                       :textToHighlight="memory.description"
+                       :autoEscape="true">
+          </Highlighter>
           <br><br>
-          <text-highlight :queries="queries">
-          Username: {{ memory.username }}
-          </text-highlight>
+          <Highlighter v-if="memory.username"
+                       :searchWords="queries"
+                       :textToHighlight="'User: ' + memory.username"
+                       :autoEscape="true">
+          </Highlighter>
           <br>
-          <text-highlight :queries="queries">
-          Location: {{ memory.location }}
-          </text-highlight>
+          <Highlighter v-if="memory.location"
+                       :searchWords="queries"
+                       :textToHighlight="'Location: ' + memory.location"
+                       :autoEscape="true">
+          </Highlighter>
           <br>
-          <text-highlight :queries="queries">
-          People: {{ memory.taggedPeople }}
-          </text-highlight>
+          <Highlighter v-if="memory.taggedPeople"
+                       :searchWords="queries"
+                       :textToHighlight="'People: ' + memory.taggedPeople"
+                       :autoEscape="true">
+          </Highlighter>
           <br>
         </div>
         <!-- </p> -->
@@ -55,6 +61,7 @@
 
 import axios from 'axios';
 import TextHighlight from 'vue-text-highlight';
+import Highlighter from 'vue-highlight-words';
 import MemoryImg from './MemoryImg.vue';
 import AnnotationRect from './AnnotationRect.vue';
 
@@ -65,6 +72,7 @@ export default {
     MemoryImg,
     AnnotationRect,
     TextHighlight,
+    Highlighter,
   },
 
   data() {
