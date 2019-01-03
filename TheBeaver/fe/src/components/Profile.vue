@@ -24,10 +24,17 @@
           placeholder="Enter a location"
         />
         <b-form-input class="editImage" type="text" v-model="imgUrl" placeholder="Image URL"/>
-        <b-form-select class="selectDecade" v-model="selected">
+     <!--    <b-form-select  v-model="selected">
           <option v-for="option in options" v-bind:key="option.value">{{ option.value }}</option>
         </b-form-select>
-        <span>Selected: {{ selected }}</span>
+        <span>Selected: {{ selected }}</span> -->
+        <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <date-picker class="selectDecade" v-model="date" :config="options"></date-picker>
+      </div>
+    </div>
+  </div>
         <b-form-textarea
           class="editDescription"
           type="text"
@@ -77,6 +84,12 @@
 </template>
 <script>
 import axios from 'axios';
+import Vue from 'vue';
+import 'bootstrap/dist/css/bootstrap.css';
+import datePicker from 'vue-bootstrap-datetimepicker';
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+
+Vue.use(datePicker);
 
 export default {
   name: 'Profile',
@@ -98,7 +111,7 @@ export default {
       secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
       selected: '10s',
-      options: [
+      /* options: [
         { key: 'Tens', value: '10s' },
         { key: 'Twenties', value: '20s' },
         { key: 'Thirties', value: '30s' },
@@ -108,7 +121,16 @@ export default {
         { key: 'Seventies', value: '70s' },
         { key: 'Eighties', value: '80s' },
         { key: 'Nineties', value: '90s' },
-      ],
+      ], */
+      date: new Date(),
+      options: {
+        format: 'MM/YYYY',
+        useCurrent: false,
+        viewMode: 'decades',
+      },
+      components: {
+        datePicker,
+      },
     };
   },
 
@@ -275,7 +297,6 @@ ul.memoryList li p {
 .selectDecade {
   grid-area: selectDecade;
   margin-top: 10px;
-  margin-left: 15px;
 }
 .view-annotations {
   grid-area: view-annotations;
