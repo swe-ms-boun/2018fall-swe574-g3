@@ -24,17 +24,16 @@
           placeholder="Enter a location"
         />
         <b-form-input class="editImage" type="text" v-model="imgUrl" placeholder="Image URL"/>
-     <!--    <b-form-select  v-model="selected">
-          <option v-for="option in options" v-bind:key="option.value">{{ option.value }}</option>
+        <b-form-select class="selectDecade" v-model="selected">
+          <option v-for="option in opsiyonlar" v-bind:key="option.value">{{ option.key }}</option>
         </b-form-select>
-        <span>Selected: {{ selected }}</span> -->
-        <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <date-picker class="selectDecade" v-model="date" :config="options"></date-picker>
-      </div>
-    </div>
-  </div>
+        <div class="selectExactDate" v-bind:style="[selected == 'Select a decade to disable exact date entry' ? {visibility:'visible'}:{visibility:'hidden'}]">
+          <div class="row">
+           <div class="col-md-12">
+            <date-picker  v-model="date" :config="options"></date-picker>
+           </div>
+           </div>
+        </div>
         <b-form-textarea
           class="editDescription"
           type="text"
@@ -110,23 +109,24 @@ export default {
       baseURL: 'https://beaver-memories.now.sh',
       secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
-      selected: '10s',
-      /* options: [
-        { key: 'Tens', value: '10s' },
-        { key: 'Twenties', value: '20s' },
-        { key: 'Thirties', value: '30s' },
-        { key: 'Forties', value: '40s' },
-        { key: 'Fifties', value: '50s' },
-        { key: 'Sixties', value: '60s' },
-        { key: 'Seventies', value: '70s' },
-        { key: 'Eighties', value: '80s' },
-        { key: 'Nineties', value: '90s' },
-      ], */
+      selected: 'Select a decade to disable exact date entry',
+      opsiyonlar: [
+        { key: 'Select a decade to disable exact date entry', value: null },
+        { key: '1910s', value: '10s' },
+        { key: '1920s', value: '20s' },
+        { key: '1930s', value: '30s' },
+        { key: '1940s', value: '40s' },
+        { key: '1950s', value: '50s' },
+        { key: '1960s', value: '60s' },
+        { key: '1970s', value: '70s' },
+        { key: '1980s', value: '80s' },
+        { key: '1990s', value: '90s' },
+      ],
       date: new Date(),
       options: {
-        format: 'MM/YYYY',
+        format: 'DD.MM.YYYY',
         useCurrent: false,
-        viewMode: 'decades',
+        viewMode: 'years',
       },
       components: {
         datePicker,
@@ -296,7 +296,14 @@ ul.memoryList li p {
 }
 .selectDecade {
   grid-area: selectDecade;
-  margin-top: 10px;
+  margin-top: 15px;
+  margin-left: 15px;
+  margin-bottom: 20px;
+}
+.selectExactDate {
+  grid-area: selectExactDate;
+  margin-top: 15px;
+  margin-left: 15px;
 }
 .view-annotations {
   grid-area: view-annotations;
@@ -308,12 +315,13 @@ ul.memoryList li p {
   margin-top: 10px;
   display: grid;
   grid-template:
-    " thumbnail         editTitle        " 15%
-    " thumbnail         editTaggedPeople " 15%
-    " thumbnail         editLocation     " 15%
-    " thumbnail         editImage        " 15%
-    " thumbnail         selectDecade     " 15%
-    " editDescription   editDescription  " auto
+    " thumbnail         editTitle        " 10%
+    " thumbnail         editTaggedPeople " 10%
+    " thumbnail         editLocation     " 10%
+    " thumbnail         editImage        " 10%
+    " thumbnail         selectDecade     " 10%
+    " thumbnail         selectExactDate  " 10%
+    " editDescription   editDescription  " 40%
     / 256px auto;
 }
 
