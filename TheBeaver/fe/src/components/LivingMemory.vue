@@ -26,6 +26,9 @@
             <div v-if="memory.taggedPeople">
               People: {{ memory.taggedPeople }}
             </div>
+            <div v-if="memory.time">
+              Time: {{ memory.time }}
+            </div>
             <div v-if="memory.isPublic">
               Public: {{memory.isPublic}}
             </div>
@@ -87,6 +90,7 @@ export default {
               username: memory.username,
               isPublic: memory.isPublic,
               imgUrl: memory.imgUrl,
+              time: memory.time,
               // eslint-disable-next-line
               id: memory._id,
             });
@@ -166,6 +170,8 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
 .view-annotations {
   grid-area: view-annotations;
   margin-top: 24px;
+  font-weight: bold;
+  color: #219c69;
 }
 
 .description {

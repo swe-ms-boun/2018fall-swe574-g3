@@ -8,6 +8,7 @@ var memorySchema = mongoose.Schema({
     isPublic: Boolean,
     taggedPeople: String,
     location: String,
+    time: String,
     imgUrl: String,
 });
 

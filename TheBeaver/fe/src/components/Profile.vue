@@ -10,19 +10,23 @@
         <b-form-input class="editTitle"
                       type="text"
                       v-model="title"
-                      placeholder="Enter a title"/>
+                      placeholder="Tell us what"/>
         <b-form-input class="editTaggedPeople"
                       type="text"
                       v-model="taggedPeople"
-                      placeholder="Names to be tagged"/>
+                      placeholder="Tell us who"/>
         <b-form-input class="editLocation"
                       type="text"
                       v-model="location"
-                      placeholder="Enter a location"/>
+                      placeholder="Tell us where"/>
         <b-form-input class="editImage"
                       type="text"
                       v-model="imgUrl"
                       placeholder="Image URL"/>
+        <b-form-input class="editTime"
+                      type="text"
+                      v-model="time"
+                      placeholder="Tell us when"/>
         <b-form-textarea class="editDescription"
                       type="text"
                       v-model="message"
@@ -43,12 +47,13 @@
             <br>
             <br>
             <div v-if="memory.location">
-              <samp  style="font-family:Avenir;">
                 Location: {{ memory.location }}
-              </samp>
             </div>
             <div v-if="memory.taggedPeople">
-              <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+              People: {{ memory.taggedPeople }}
+            </div>
+            <div v-if="memory.time">
+              Time: {{ memory.time }}
             </div>
             <div v-if="memory.isPublic">
               Public: {{memory.isPublic}}
@@ -90,6 +95,7 @@ export default {
       username: '',
       location: '',
       imgUrl: '',
+      time: '',
       taggedPeople: '',
       baseURL: 'https://beaver-memories.now.sh',
       secondaryURL: 'https://beaver-annotations.now.sh',
@@ -134,6 +140,7 @@ export default {
               taggedPeople : memory.taggedPeople,
               location: memory.location,
               title: memory.title,
+              time: memory.time,
               isPublic: memory.isPublic,
               id: memory._id,
             })
@@ -148,6 +155,7 @@ export default {
           title: this.title,
           imgUrl: this.imgUrl,
           location: this.location,
+          time: this.time,
           taggedPeople: this.taggedPeople,
           username: this.username,
           isPublic: true
@@ -251,16 +259,19 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 .view-annotations {
   grid-area: view-annotations;
   bottom: 10px;
+  font-weight: bold;
+  color: #219c69;
 }
 
 .inputText {
   grid-area: inputText;
   margin-top: 10px;
   display: grid;
-  grid-template: " thumbnail         editTitle        " 15%
-                 " thumbnail         editTaggedPeople " 15%
-                 " thumbnail         editLocation     " 15%
-                 " thumbnail         editImage        " 15%
+  grid-template: " thumbnail         editTitle        " 1fr
+                 " thumbnail         editTaggedPeople " 1fr
+                 " thumbnail         editLocation     " 1fr
+                 " thumbnail         editTime         " 1fr
+                 " thumbnail         editImage        " 1fr
                  " editDescription   editDescription  " auto
                  / 256px             auto;
 }
@@ -288,6 +299,10 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
   margin: 15px;
 }
 
+.editTime {
+  grid-area: editTime;
+  margin: 15px;
+}
 .editLocation {
   grid-area: editLocation;
   margin: 15px;

@@ -28,6 +28,13 @@
                        :autoEscape="true">
           </Highlighter>
           <br>
+          <Highlighter v-if="memory.time"
+                       :searchWords="queries"
+                       :textToHighlight="'Time: ' + memory.time"
+                       :autoEscape="true">
+          </Highlighter>
+          <br>
+          <br>
         </div>
         <!-- </p> -->
         <b-button class="annotate"
@@ -269,10 +276,10 @@ export default {
 .memoryCell {
   grid-area: memoryCell;
   display: grid;
-  grid-template: " .          .             .          .            " auto
+  grid-template: " thumbnail  .             .          .            " auto
                  " thumbnail  title         .          .            " auto
                  " thumbnail  description   .          .            " auto
-                 " thumbnail  .             annotate   annotate     " auto
+                 " .          .             annotate   annotate     " auto
                  / auto       1fr           auto       auto;
   text-align: left;
 
