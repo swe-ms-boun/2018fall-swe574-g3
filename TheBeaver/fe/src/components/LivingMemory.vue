@@ -20,9 +20,6 @@
             <div v-if="memory.username">
               User: {{ memory.username }}
             </div>
-            <div v-if="memory.location">
-              Location: {{ memory.location }}
-            </div>
             <div v-if="memory.taggedPeople">
               People: {{ memory.taggedPeople }}
             </div>
@@ -57,7 +54,9 @@ export default {
     return {
       memories: [],
       searchedKeyword: '',
-      baseURL: 'https://beaver-memories.now.sh',
+      // baseURL: 'https://beaver-memories.now.sh',
+      baseURL: 'http://localhost:3001',
+
     };
   },
 

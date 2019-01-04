@@ -15,10 +15,7 @@
                       type="text"
                       v-model="taggedPeople"
                       placeholder="Tell us who"/>
-        <b-form-input class="editLocation"
-                      type="text"
-                      v-model="location"
-                      placeholder="Tell us where"/>
+        <div class="google-map" :id="mapName"></div>
         <b-form-input class="editImage"
                       type="text"
                       v-model="imgUrl"
@@ -46,9 +43,6 @@
             {{ memory.description }}
             <br>
             <br>
-            <div v-if="memory.location">
-                Location: {{ memory.location }}
-            </div>
             <div v-if="memory.taggedPeople">
               People: {{ memory.taggedPeople }}
             </div>
@@ -79,11 +73,20 @@
 <script>
 
 import axios from 'axios';
+import $Scriptjs from 'scriptjs';
 
 export default {
 
   name: 'Profile',
   // Variables here
+  props: ['name'],
+
+  mounted() {
+    $Scriptjs('https://maps.googleapis.com/maps/api/js?key=AIzaSyDizCTlHkRUed4C1f2E1dQxOz2Y93qVBZk', () => {
+      this.initMap();
+    });
+  },
+
   data() {
     return {
       memories: [],
@@ -97,9 +100,15 @@ export default {
       imgUrl: '',
       time: '',
       taggedPeople: '',
-      baseURL: 'https://beaver-memories.now.sh',
+      // baseURL: 'https://beaver-memories.now.sh',
+      baseURL: 'http://localhost:3001',
       secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
+      mapName: `${this.name}-map`,
+      coordinates: [],
+      map: null,
+      bounds: null,
+      markers: [],
     };
   },
 
@@ -117,11 +126,32 @@ export default {
       this.username = 'anonymous';
     }
     await this.getAllMemories();
-
   },
 
   // Methods here
   methods: {
+
+    initMap() {
+      this.bounds = new google.maps.LatLngBounds();
+      const element = document.getElementById(this.mapName)
+      let mapCentre = {latitude: 41.015137, longitude: 28.979530}
+      const options = {
+        center: new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude)
+      }
+      const position = new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude);
+      this.map = new google.maps.Map(element, options);
+      this.map.setZoom(10);
+      this.map.addListener('click', ((e) => {
+        let latlng = e.latLng;
+        this.coordinates.push({lat: latlng.lat(),lng: latlng.lng()})
+        var marker = new google.maps.Marker({
+          position: latlng,
+          map: this.map
+        });
+        this.markers.push(marker);
+      }).bind(this));
+    },
+
     async getAllMemories() {
       this.memories = [];
       if (this.username == 'anonymous') {
@@ -154,7 +184,7 @@ export default {
           description: this.message,
           title: this.title,
           imgUrl: this.imgUrl,
-          location: this.location,
+          location: this.coordinates,
           time: this.time,
           taggedPeople: this.taggedPeople,
           username: this.username,
@@ -181,8 +211,7 @@ export default {
           console.log(error);
         });
     },
-  }
-
+  },
 };
 </script>
 
@@ -269,7 +298,7 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
   display: grid;
   grid-template: " thumbnail         editTitle        " 1fr
                  " thumbnail         editTaggedPeople " 1fr
-                 " thumbnail         editLocation     " 1fr
+                 " thumbnail         editLocation     " 256px
                  " thumbnail         editTime         " 1fr
                  " thumbnail         editImage        " 1fr
                  " editDescription   editDescription  " auto
@@ -308,10 +337,6 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
   margin: 15px;
 }
 
-.editLocation {
-  grid-area: editLocation;
-  margin: 15px;
-}
 .editTaggedPeople {
   grid-area: editTaggedPeople;
   margin: 15px;
@@ -334,6 +359,12 @@ ul.memoryList li p { margin: 15px; display: block; width: 100%; height: 100%; }
 
 .links.view-annotations a.router-link-exact-active  {
   color: #e6da70;
+}
+
+.google-map {
+  margin: 15px;
+  background: gray;
+  grid-area: editLocation;
 }
 
 </style>
