@@ -57,7 +57,8 @@ export default {
     return {
       memories: [],
       searchedKeyword: '',
-      baseURL: 'https://beaver-memories.now.sh',
+      // baseURL: 'https://beaver-memories.now.sh',
+      baseURL: 'http://localhost:3001',
     };
   },
 

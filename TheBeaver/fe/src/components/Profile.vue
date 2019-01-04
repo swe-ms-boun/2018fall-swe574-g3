@@ -72,8 +72,7 @@
             <img v-if="memory.imgUrl" :src="memory.imgUrl">
             <img
               v-else
-              src="http://savings.gov.pk/wp-content/plugins/ldd-directory-lite/public/images/noimage.png"
-            >
+              src="http://savings.gov.pk/wp-content/plugins/ldd-directory-lite/public/images/noimage.png">
           </div>
           <br>
         </li>
@@ -106,7 +105,8 @@ export default {
       location: '',
       imgUrl: '',
       taggedPeople: '',
-      baseURL: 'https://beaver-memories.now.sh',
+      // baseURL: 'https://beaver-memories.now.sh',
+      baseURL: 'http://localhost:3001',
       secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
       selected: 'Select a decade to disable exact date entry',
