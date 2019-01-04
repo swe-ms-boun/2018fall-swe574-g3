@@ -38,7 +38,15 @@ app_detail.listen(8004, () => {
             database.collection('annotations').find({ "target.source": { '$regex': req.params['0'], '$options': 'i' } })
                 .toArray((error_annotation, result_annotation) => {
                     if (error_annotation) { return res.status(500).send(error_annotation) };
+                   for (const key in result_annotation) {
+                       if (result_annotation.hasOwnProperty(key)) {
+                           const element = result_annotation[key].body;
+                           if(element) {console.log(element['value']);}
+                           
+                       }
+                   }
                     res.jsonp(result_annotation)
+                    
                 });
         }),
         app_detail.post("/annotate/", (req, res) => {
