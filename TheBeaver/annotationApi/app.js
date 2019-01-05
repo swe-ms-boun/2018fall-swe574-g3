@@ -42,11 +42,11 @@ app_detail.listen(8004, () => {
                        if (result_annotation.hasOwnProperty(key)) {
                            const element = result_annotation[key].body;
                            if(element) {console.log(element['value']);}
-                           
+
                        }
                    }
                     res.jsonp(result_annotation)
-                    
+
                 });
         }),
         app_detail.post("/annotate/", (req, res) => {

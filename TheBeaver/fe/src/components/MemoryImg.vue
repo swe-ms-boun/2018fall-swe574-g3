@@ -18,6 +18,7 @@
 export default {
   name: 'MemoryImg',
   // Variables here
+
   data() {
     return {
       isTracking: false,
@@ -75,10 +76,12 @@ export default {
       this.endY = offsetY;
       this.updateRect();
     },
+
     updateRect() {
       this.$emit('anno-rect-changed', this.annotationRectangle);
     },
   },
+
 };
 
 </script>

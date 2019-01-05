@@ -4,7 +4,7 @@
     <div class="memoryCell">
         <p class="title">{{ memory.title }}</p>
         <!-- <p v-html="memory.description"> -->
-        <div class="description">
+        <div class="description" @click="clickHandle($event)">
           <Highlighter :searchWords="queries"
                        :textToHighlight="memory.description"
                        :autoEscape="true">
@@ -37,9 +37,13 @@
           <br>
         </div>
         <!-- </p> -->
-        <b-button class="annotate"
+        <b-button class="annotateText"
                 variant="info"
-                @click="annotate()">Annotate
+                @click="annotateText()">Annotate Text
+        </b-button>
+        <b-button class="annotateImage"
+                variant="info"
+                @click="annotateImage()">Annotate Image
         </b-button>
          <b-form-textarea
           class="comment"
@@ -68,6 +72,7 @@
     <!-- <pre id="annot">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre> -->
     <pre id="debug" style="display:none">{{ annotationTextObject }}</pre>
   </div>
+  <p>{{comments}}</p>
 </div>
 </template>
 <script>
@@ -78,6 +83,11 @@ import Highlighter from 'vue-highlight-words';
 import MemoryImg from './MemoryImg.vue';
 import AnnotationRect from './AnnotationRect.vue';
 
+const $ = require('jquery');
+
+window.$ = $;
+require('jquery-confirm');
+
 export default {
   name: 'Memory',
   // Variables here
@@ -87,6 +97,11 @@ export default {
     TextHighlight,
     Highlighter,
   },
+
+  mounted() {
+    window.addEventListener('mousemove', this.mouseIsMoving);
+  }, // mounted
+
 
   data() {
     return {
@@ -102,6 +117,7 @@ export default {
       annotationImageRect: {},
       isPhotoLoaded: false,
       comment: '',
+      clickedText: '',
     };
   },
 
@@ -118,6 +134,27 @@ export default {
   },
 
   computed: {
+
+    comments() {
+      if (!this.clickedText || !this.textAnnotations) {return;};
+      console.log("Clicked: " + this.clickedText);
+      this.textAnnotations.forEach(anno => {
+        console.log(anno.target.selector.exact);
+      });
+      try {
+      var a = this.textAnnotations
+                .filter(annotation => annotation.target.selector.exact.includes(this.clickedText))
+                .map(annotation => annotation.body.value)
+      } catch (e) {
+        console.log(e);
+      }
+      return a;
+    },
+
+    imgRatioText() {
+      return `${this.annotationImageRectRatio.x},${this.annotationImageRectRatio.y},${this.annotationImageRectRatio.width},${this.annotationImageRectRatio.height}`
+    },
+
     annotationTextObject() {
       if (!this.annotatedText) {
         return {};
@@ -145,37 +182,46 @@ export default {
       if (!this.annotationImageRectRatio) {
         return {};
       }
-      let annotationObject = {"@context": "http://www.w3.org/ns/anno.jsonld",
-      "type": "Annotation",
-      "body": {
-        "type": "TextualBody",
-        "value": this.comment,
-        "format": "text/plain"
-      },
-      "created":new Date().toISOString(),
-      "creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"},
-      "generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host},
-      "motivation":"tagging",
-      "target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname,
-                          "selector":{"type": "ImageSelector", "rect" : this.annotationImageRectRatio}}
+      let annotationObject = {
+      "@context": "http://www.w3.org/ns/anno.jsonld",
+        "type": "Annotation",
+        "body": {
+          "type": "TextualBody",
+          "value": this.comment,
+          "format": "text/plain"
+        },
+        "created":new Date().toISOString(),
+        "creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"},
+        "generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host},
+        "motivation":"tagging",
+        "target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname,
+                  "id": this.memory.imgUrl+"#xywh%3D"+this.imgRatioText,
+                  "type": "Image",
+                  "format": "image/jpeg",
+        }
       };
       return annotationObject;
     },
 
     textAnnotations() {
-      return this.annotations.filter(annotation => annotation.target.selector.type === 'TextQuoteSelector');
+      return this.annotations.filter(annotation => annotation.target.selector && annotation.target.selector.type === 'TextQuoteSelector');
     },
 
     imageAnnotations() {
       return this.annotations
-              .filter(annotation => annotation.target.selector.type === 'ImageSelector')
+              .filter(annotation => annotation.target.type === 'Image')
               .map(annotation => {
-                if (!this.isPhotoLoaded || !this.$refs.memoryImage) { return annotation };
+                if (!this.isPhotoLoaded ||
+                    !this.$refs.memoryImage ||
+                    !annotation.target.id ||
+                    !annotation.target.id.includes('#xywh=')) {
+                      return annotation
+                };
                 const { width: imageWidth, height: imageHeight} = this.$refs.memoryImage.$refs.image.getBoundingClientRect();
                 return {
                   id: annotation._id,
                   rect: this.getAbsoluteRect({
-                    rect: annotation.target.selector.rect,
+                    rect: this.rect(annotation),
                     imageWidth,
                     imageHeight,
                   })
@@ -219,6 +265,15 @@ export default {
       })
     },
 
+    rect(annotation) {
+      let imgLink = annotation.target.id;
+      if(!imgLink) {return;};
+      let ratios = imgLink.split("#xywh=");
+      let rectParams = ratios[1].split(',');
+      return {x: rectParams[0], y: rectParams[1], width: rectParams[2], height: rectParams[3]};
+      console.log("Rect Params: " + rectParams[1])
+    },
+
     getAbsoluteRect({rect, imageWidth, imageHeight}) {
       let {x, y, width, height} = rect;
       x *= imageWidth;
@@ -249,10 +304,9 @@ export default {
       }
     },
 
-    async annotate() {
+    async annotateText() {
 
       this.getTextAnnotation()
-
       if (this.annotationTextObject) {
         const res = await axios.post(
           `${this.annotationURL}/annotate`, {annotationObject: this.annotationTextObject},
@@ -263,9 +317,16 @@ export default {
           });
       }
 
+      await this.getAnnotations();
+
+    },
+
+    async annotateImage() {
+
       if (this.annotationImageObject) {
+        let annotationObject = this.annotationImageObject;
         const res = await axios.post(
-          `${this.annotationURL}/annotate`, {annotationObject: this.annotationImageObject},
+          `${this.annotationURL}/annotate`, {annotationObject},
           {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -275,8 +336,49 @@ export default {
 
       await this.getAnnotations();
     },
-  }
+
+    mouseIsMoving(e) {
+      const x = e.pageX;
+      const y = e.pageY;
+      //console.log(x, y);
+    },
+
+    clickHandle(e) {
+      let s = window.getSelection();
+      var range = s.getRangeAt(0);
+      var node = s.anchorNode;
+
+      while (range.toString().indexOf(' ') != 0 && range.startOffset != 0) {
+          range.setStart(node, (range.startOffset - 1));
+      }
+      range.setStart(node, range.startOffset + 1);
+
+      do {
+          range.setEnd(node, range.endOffset + 1);
+      } while (range.toString().indexOf(' ') == -1 && range.toString().trim() != '' && range.endOffset < range.endContainer.length);
+
+      var str = range.toString().trim();
+      this.clickedText = str;
+    }
+  },
+
+  destroyed() {
+    window.removeEventListener('mousemove', this.mouseIsMoving);
+  },
+
 }
+
+  // $(".description").on('contextmenu', function(evt) {
+  //     evt.preventDefault();
+  //     var e = window.event;
+  //     if (e.button == 2) {
+  //         var range = document.caretRangeFromPoint(e.pageX, e.pageY - $(document).scrollTop());
+  //         var selection = window.getSelection();
+  //         selection.removeAllRanges();
+  //         selection.addRange(range);
+  //         jQuery(document.elementFromPoint(e.pageX, e.pageY - $(document).scrollTop())).click();
+  //     }
+  // });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -296,10 +398,10 @@ export default {
 .memoryCell {
   grid-area: memoryCell;
   display: grid;
-  grid-template: " thumbnail  .             .          .            " auto
-                 " thumbnail  title         .          .            " auto
-                 " thumbnail  description   .          .            " auto
-                 " .          comment       annotate   annotate     " auto
+  grid-template: " thumbnail  .             .              .             " auto
+                 " thumbnail  title         title          title         " auto
+                 " thumbnail  description   description    description   " auto
+                 " comment    comment       annotateText   annotateImage " auto
                  / auto       1fr           auto       auto;
   text-align: left;
 
@@ -328,9 +430,16 @@ export default {
   margin-top: 10px;
 }
 
-.annotate {
-  grid-area: annotate;
+.annotateText {
+  grid-area: annotateText;
   padding-bottom: 10px;
+  margin: 10px;
+}
+
+.annotateImage {
+  grid-area: annotateImage;
+  padding-bottom: 10px;
+    margin: 10px;
 }
 
 .deleteButton {
