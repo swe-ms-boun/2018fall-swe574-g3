@@ -202,7 +202,7 @@ export default {
         { key: 'September', value: 9 },
         { key: 'October', value: 10 },
         { key: 'November', value: 11 },
-        { key: 'November', value: 12 },
+        { key: 'December', value: 12 },
       ]
     },
 
