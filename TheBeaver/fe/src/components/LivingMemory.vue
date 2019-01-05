@@ -26,8 +26,8 @@
             <div v-if="memory.taggedPeople">
               People: {{ memory.taggedPeople }}
             </div>
-            <div v-if="memory.time">
-              Time: {{ memory.time }}
+            <div v-if="memory.date">
+              Date: {{ getMemoryDate(memory.date)}}
             </div>
             <div v-if="memory.isPublic">
               Public: {{memory.isPublic}}
@@ -90,13 +90,34 @@ export default {
               taggedPeople: memory.taggedPeople,
               username: memory.username,
               isPublic: memory.isPublic,
+              date: memory.date,
               imgUrl: memory.imgUrl,
-              time: memory.time,
               // eslint-disable-next-line
               id: memory._id,
             });
           });
         });
+    },
+    
+    getMemoryDate(date) {
+      let a = '';
+      if (!date.year && date.decade) {
+        a = date.decade + 's'
+        return a;
+      }
+
+      if (date.year) {
+        a = date.year;
+      } 
+
+      if (date.month && date.year) {
+        a = date.month + '-' + a;
+      }
+
+      if (date.day && date.month && date.year) {
+        a = date.day + '-' + a;
+      }
+      return a;
     },
   },
 };

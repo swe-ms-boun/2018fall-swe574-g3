@@ -24,16 +24,33 @@
           placeholder="Enter a location"
         />
         <b-form-input class="editImage" type="text" v-model="imgUrl" placeholder="Image URL"/>
-        <b-form-select class="selectDecade" v-model="selected">
-          <option v-for="option in opsiyonlar" v-bind:key="option.value">{{ option.key }}</option>
-        </b-form-select>
-        <div class="selectExactDate" v-bind:style="[selected == 'Select a decade to disable exact date entry' ? {visibility:'visible'}:{visibility:'hidden'}]">
+
+        <div class="selectDate">
+          <b-form-select class="selectDecade" v-model="decadesInt" value="Enter a decade">
+            <option v-for="option in decadeOptions" :value="option.value" :key="option.value">{{ option.key }}</option>
+          </b-form-select>
+
+          <b-form-select class="selectYear" :disabled="!decadesInt" v-model="yearsInt">
+            <option v-for="option in years" :value="option.value" :key="option.value">{{ option.key }}</option>
+          </b-form-select>
+
+          <b-form-select class="selectMonth" :disabled="!yearsInt" v-model="monthString">
+            <option v-for="option in monthOptions" :value="option.value" v-bind:key="option.value">{{ option.key }}</option>
+          </b-form-select>
+
+          <b-form-select class="selectDay" :disabled="!monthString || !yearsInt " v-model="dayInt">
+            <option v-for="option in days" :value="option.value" v-bind:key="option.value">{{ option.key }}</option>
+          </b-form-select> 
+        </div>
+
+
+        <!-- <div class="selectExactDate" v-bind:style="[selected == 'Select a decade to disable exact date entry' ? {visibility:'visible'}:{visibility:'hidden'}]">
           <div class="row">
            <div class="col-md-12">
             <date-picker  v-model="date" :config="options"></date-picker>
            </div>
            </div>
-        </div>
+        </div> -->
         <b-form-textarea
           class="editDescription"
           type="text"
@@ -54,6 +71,9 @@
             <br>
             <div v-if="memory.location">
               <samp style="font-family:Avenir;">Location: {{ memory.location }}</samp>
+            </div>
+            <div v-if="memory.date">
+              Date: {{ getMemoryDate(memory.date)}}
             </div>
             <div v-if="memory.taggedPeople">
               <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
@@ -104,24 +124,31 @@ export default {
       username: '',
       location: '',
       imgUrl: '',
+      decadesInt:null,
+      yearsInt: null,
+      monthString: null,
+      dayInt:null,
       taggedPeople: '',
       // baseURL: 'https://beaver-memories.now.sh',
       baseURL: 'http://localhost:3001',
       secondaryURL: 'https://beaver-annotations.now.sh',
       annotatedText: '',
-      selected: 'Select a decade to disable exact date entry',
-      opsiyonlar: [
-        { key: 'Select a decade to disable exact date entry', value: null },
-        { key: '1910s', value: '10s' },
-        { key: '1920s', value: '20s' },
-        { key: '1930s', value: '30s' },
-        { key: '1940s', value: '40s' },
-        { key: '1950s', value: '50s' },
-        { key: '1960s', value: '60s' },
-        { key: '1970s', value: '70s' },
-        { key: '1980s', value: '80s' },
-        { key: '1990s', value: '90s' },
+      decadeOptions: [
+        { key: 'Select a decade', value: null },
+        { key: '1900s', value: 1900 },
+        { key: '1910s', value: 1910 },
+        { key: '1920s', value: 1920 },
+        { key: '1930s', value: 1930 },
+        { key: '1940s', value: 1940 },
+        { key: '1950s', value: 1950 },
+        { key: '1960s', value: 1960 },
+        { key: '1970s', value: 1970 },
+        { key: '1980s', value: 1980 },
+        { key: '1990s', value: 1990 },
+        { key: '2000s', value: 2000 },
+        { key: '2010s', value: 2010 },
       ],
+     
       date: new Date(),
       options: {
         format: 'DD.MM.YYYY',
@@ -134,9 +161,87 @@ export default {
     };
   },
 
-  // Setters here
-  watch: {
-    /* eslint-disable */
+  computed: {
+
+    memoryDate() {
+      return {
+        decade: this.decadesInt,
+        year: this.yearsInt,
+        month: this.monthString,
+        day: this.dayInt,
+      }
+    },
+
+    years() { 
+      return [
+        { key: 'Select a year', value: null },
+        { key: this.decadesInt, value: this.decadesInt },
+        { key: this.decadesInt+1, value: this.decadesInt+1 },
+        { key: this.decadesInt+2, value: this.decadesInt+2 },
+        { key: this.decadesInt+3, value: this.decadesInt+3 },
+        { key: this.decadesInt+4, value: this.decadesInt+4 },
+        { key: this.decadesInt+5, value: this.decadesInt+5 },
+        { key: this.decadesInt+6, value: this.decadesInt+6 },
+        { key: this.decadesInt+7, value: this.decadesInt+7 },
+        { key: this.decadesInt+8, value: this.decadesInt+8 },
+        { key: this.decadesInt+9, value: this.decadesInt+9 },
+      ]
+    },
+
+    monthOptions() {
+      return [
+        { key: 'Select a month', value: null },
+        { key: 'January', value: 1 },
+        { key: 'February', value: 2 },
+        { key: 'March', value: 3 },
+        { key: 'April', value: 4 },
+        { key: 'May', value: 5 },
+        { key: 'June', value: 6 },
+        { key: 'July', value: 70 },
+        { key: 'August', value: 8 },
+        { key: 'September', value: 9 },
+        { key: 'October', value: 10 },
+        { key: 'November', value: 11 },
+        { key: 'November', value: 12 },
+      ]
+    },
+
+    days() {
+      return [
+        { key: 'Select a day', value: null },
+        { key: '1', value: 1 },
+        { key: '2', value: 2 },
+        { key: '3', value: 3 },
+        { key: '4', value: 4 },
+        { key: '5', value: 5 },
+        { key: '6', value: 6 },
+        { key: '7', value: 7 },
+        { key: '8', value: 8 },
+        { key: '9', value: 9 },
+        { key: '10', value: 10 },
+        { key: '11', value: 11 },
+        { key: '12', value: 12 }, 
+        { key: '13', value: 13 },
+        { key: '14', value: 14 },
+        { key: '15', value: 15 },
+        { key: '16', value: 16 },
+        { key: '17', value: 17 },
+        { key: '18', value: 18 },
+        { key: '19', value: 19 },
+        { key: '20', value: 20 },
+        { key: '21', value: 21 },
+        { key: '22', value: 22 },  
+        { key: '23', value: 23 },
+        { key: '24', value: 24 },
+        { key: '25', value: 25 },
+        { key: '26', value: 26 },
+        { key: '27', value: 27 },
+        { key: '28', value: 28 },
+        { key: '29', value: 29 },
+        { key: '30', value: 30 },
+        { key: '31', value: 31 },
+      ]
+    },
   },
 
   // On Create here
@@ -172,12 +277,34 @@ export default {
               imgUrl: memory.imgUrl,
               taggedPeople: memory.taggedPeople,
               location: memory.location,
+              date: memory.date,
               title: memory.title,
               isPublic: memory.isPublic,
               id: memory._id
             });
           });
         });
+    },
+
+    getMemoryDate(date) {
+      let a = '';
+      if (!date.year && date.decade) {
+        a = date.decade + 's'
+        return a;
+      }
+
+      if (date.year) {
+        a = date.year;
+      } 
+
+      if (date.month && date.year) {
+        a = date.month + '-' + a;
+      }
+
+      if (date.day && date.month && date.year) {
+        a = date.day + '-' + a;
+      }
+      return a;
     },
 
     async postMemory() {
@@ -189,6 +316,7 @@ export default {
           location: this.location,
           taggedPeople: this.taggedPeople,
           username: this.username,
+          date: this.memoryDate,
           isPublic: true
         })
         .then(async response => {
@@ -296,10 +424,24 @@ ul.memoryList li p {
 }
 .selectDecade {
   grid-area: selectDecade;
-  margin-top: 15px;
-  margin-left: 15px;
-  margin-bottom: 20px;
+  margin: 15px;
 }
+
+.selectYear {
+  grid-area: selectYear;
+  margin: 15px;
+}
+
+.selectMonth {
+  grid-area: selectMonth;
+  margin: 15px;
+}
+
+.selectDay {
+  grid-area: selectDay;
+  margin: 15px;
+}
+
 .selectExactDate {
   grid-area: selectExactDate;
   margin-top: 15px;
@@ -312,16 +454,15 @@ ul.memoryList li p {
 
 .inputText {
   grid-area: inputText;
-  margin-top: 10px;
+  margin-top: 12px;
   display: grid;
-  grid-template:
-    " thumbnail         editTitle        " 10%
-    " thumbnail         editTaggedPeople " 10%
-    " thumbnail         editLocation     " 10%
-    " thumbnail         editImage        " 10%
-    " thumbnail         selectDecade     " 10%
-    " thumbnail         selectExactDate  " 10%
-    " editDescription   editDescription  " 40%
+  grid-template: " thumbnail         editTitle        " auto
+    " thumbnail         editTaggedPeople " auto
+    " thumbnail         editLocation     " auto
+    " thumbnail         editImage        " auto
+    " thumbnail         selectDate     " auto
+    " thumbnail         selectExactDate  " auto
+    " editDescription   editDescription  " auto
     / 256px auto;
 }
 
@@ -339,6 +480,13 @@ ul.memoryList li p {
   grid-area: postButton;
 }
 
+.selectDate {
+  grid-area: selectDate;
+  display: grid;
+  grid-template: " selectDecade selectYear selectMonth selectDay " auto
+                  /1fr          1fr        1fr         1fr;
+}
+
 .editTitle {
   grid-area: editTitle;
   margin: 15px;
@@ -354,10 +502,6 @@ ul.memoryList li p {
   margin: 15px;
 }
 
-.editLocation {
-  grid-area: editLocation;
-  margin: 15px;
-}
 .editTaggedPeople {
   grid-area: editTaggedPeople;
   margin: 15px;
@@ -381,3 +525,4 @@ ul.memoryList li p {
   color: #e6da70;
 }
 </style>
+

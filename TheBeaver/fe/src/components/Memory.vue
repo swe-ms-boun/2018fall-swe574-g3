@@ -28,9 +28,9 @@
                        :autoEscape="true">
           </Highlighter>
           <br>
-          <Highlighter v-if="memory.time"
+          <Highlighter v-if="memory.date"
                        :searchWords="queries"
-                       :textToHighlight="'Time: ' + memory.time"
+                       :textToHighlight="'Date: ' + getMemoryDate(memory.date)"
                        :autoEscape="true">
           </Highlighter>
           <br>
@@ -247,6 +247,27 @@ export default {
       else if (document.selection) {
         this.annotatedText =  document.selection.createRange().text;
       }
+    },
+
+    getMemoryDate(date) {
+      let a = '';
+      if (!date.year && date.decade) {
+        a = date.decade + 's'
+        return a;
+      }
+
+      if (date.year) {
+        a = date.year;
+      } 
+
+      if (date.month && date.year) {
+        a = date.month + '-' + a;
+      }
+
+      if (date.day && date.month && date.year) {
+        a = date.day + '-' + a;
+      }
+      return a;
     },
 
     async annotate() {
