@@ -26,8 +26,8 @@
             <div v-if="memory.date">
               Date: {{ getMemoryDate(memory.date)}}
             </div>
-            <div v-if="memory.isPublic">
-              Public: {{memory.isPublic}}
+            <div v-if="memory.location">
+              Location: {{memory.location}}
             </div>
           </div>
           <div class="thumbnail">
@@ -84,6 +84,7 @@ export default {
               title: memory.title,
               description: memory.description,
               location: memory.location,
+              coords: memory.coords,
               taggedPeople: memory.taggedPeople,
               username: memory.username,
               isPublic: memory.isPublic,
@@ -206,8 +207,8 @@ ul.memoryList li p { margin: 24px; display: block; width: 100%; height: 100%; }
   margin-top: 24px;
 
 }
-.isPublic {
-  grid-area: description;
+.location {
+  grid-area: location;
   margin-top: 24px;
 }
 .searchBar {

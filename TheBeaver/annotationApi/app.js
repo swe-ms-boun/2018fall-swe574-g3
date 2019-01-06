@@ -4,7 +4,7 @@ const MongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectID;
 
 const CONNECTION_URL = "mongodb+srv://dbretriever:dbretriever@living-memory-tvs0t.mongodb.net/test?retryWrites=true";
-const DATABASE_NAME = "BeaverAnnotation";
+const DATABASE_NAME = "BeaverAnnotations";
 const COLLECTION_NAME = "annotations"
 
 

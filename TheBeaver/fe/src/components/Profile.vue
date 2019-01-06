@@ -82,7 +82,10 @@
               Date: {{ getMemoryDate(memory.date)}}
             </div>
             <div v-if="memory.taggedPeople">
-              <tt style="font-family:Avenir;">People: {{ memory.taggedPeople }}</tt>
+              People: {{ memory.taggedPeople }}
+            </div>
+            <div v-if="memory.location">
+              Location: {{ memory.location }}
             </div>
             <div v-if="memory.isPublic">Public: {{memory.isPublic}}</div>
           </div>
@@ -323,6 +326,7 @@ export default {
               imgUrl: memory.imgUrl,
               taggedPeople: memory.taggedPeople,
               location: memory.location,
+              coords: memory.coords,
               date: memory.date,
               title: memory.title,
               isPublic: memory.isPublic,
@@ -369,16 +373,17 @@ export default {
               console.log(e);
             }
           });
-          setTimeout(resolve, 1000, locations);
+          setTimeout(resolve, 2000, locations);
         }
       });
       Promise.all([promise1]).then((values) => {
-        console.log(values);
+        const locs = values[0].filter(value => value.data).map(value => value.data);
         axios.post(`${this.baseURL}/postMemory`, {
           description: this.message,
           title: this.title,
           imgUrl: this.imgUrl,
-          location: this.coordinates,
+          location: locs.toString(),
+          coords: this.coordinates,
           taggedPeople: this.taggedPeople,
           username: this.username,
           date: this.memoryDate,

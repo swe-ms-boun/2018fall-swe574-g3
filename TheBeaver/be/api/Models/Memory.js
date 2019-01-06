@@ -21,7 +21,8 @@ var memorySchema = mongoose.Schema({
     description: String,
     isPublic: Boolean,
     taggedPeople: String,
-    location: [coordinateSchema],
+    location: String,
+    coords: [coordinateSchema],
     imgUrl: String,
     date: memoryDateSchema,
 });

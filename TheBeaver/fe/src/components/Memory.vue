@@ -15,7 +15,12 @@
                        :textToHighlight="'User: ' + memory.username"
                        :autoEscape="true"
                        class="memory-username">
-
+          </Highlighter>
+          <Highlighter v-if="memory.location"
+                       :searchWords="queries"
+                       :textToHighlight="'Location: ' + memory.location"
+                       :autoEscape="true"
+                       class="memory-location">
           </Highlighter>
           <div class="google-map" :id="mapName"></div>
           <Highlighter v-if="memory.taggedPeople"
@@ -141,7 +146,6 @@ export default {
     coordinates() {
       if (!this.coordinates) { return []; };
       this.coordinates.forEach((coordinate => {
-        console.log(this.coordinates);
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
             map: this.map
@@ -158,9 +162,7 @@ export default {
         return this.imageComments;
       }
       if (!this.clickedText || !this.textAnnotations) {return;};
-      console.log("Clicked: " + this.clickedText);
       this.textAnnotations.forEach(anno => {
-        console.log(anno.target.selector.exact);
       });
       try {
       var a = this.textAnnotations
@@ -177,7 +179,7 @@ export default {
     },
 
     coordinates() {
-        return this.memory.location;
+        return this.memory.coords;
     },
 
     annotationTextObject() {
@@ -321,7 +323,6 @@ export default {
       let ratios = imgLink.split("#xywh=");
       let rectParams = ratios[1].split(',');
       return {x: rectParams[0], y: rectParams[1], width: rectParams[2], height: rectParams[3]};
-      console.log("Rect Params: " + rectParams[1])
     },
 
     getAbsoluteRect({rect, imageWidth, imageHeight}) {
@@ -491,6 +492,7 @@ export default {
   grid-template: "memory-description" 1fr
                  "memory-username"  1fr
                  "memory-people"  1fr
+                 "memory-location"  1fr
                  "map"  256px
                  "memory-time"  1fr
                 / auto;
@@ -551,7 +553,10 @@ export default {
   margin: 15px;
   grid-area: memory-time;
 }
-
+.memory-location {
+  margin: 15px;
+  grid-area: memory-location;
+}
 .memory-username {
   margin: 15px;
   grid-area: memory-username;
