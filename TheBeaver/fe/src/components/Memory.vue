@@ -28,9 +28,9 @@
                        class="memory-people">
           </Highlighter>
           <br>
-          <Highlighter v-if="memory.time"
+          <Highlighter v-if="memory.date"
                        :searchWords="queries"
-                       :textToHighlight="'Time: ' + memory.time"
+                       :textToHighlight="'Date: ' + getMemoryDate(memory.date)"
                        :autoEscape="true"
                        class="memory-time">
           </Highlighter>
@@ -42,6 +42,12 @@
                 variant="info"
                 @click="annotate()">Annotate
         </b-button>
+         <b-form-textarea
+          class="comment"
+          type="text"
+          v-model="comment"
+          placeholder="Enter your annotation..."
+        />
         <div class="thumbnail">
           <memory-img @anno-rect-changed="annoRectChanged"
                       @photo-loaded="photoLoaded"
@@ -97,7 +103,8 @@ export default {
       id: '',
       // baseURL: 'https://beaver-memories.now.sh',
       baseURL: 'http://localhost:3001',
-      annotationURL: 'https://beaver-annotations.now.sh',
+      // annotationURL: 'https://beaver-annotations.now.sh',
+      annotationURL: 'http://localhost:8004',
       annotations: [],
       annotationImageRectRatio: {},
       annotationImageRect: {},
@@ -106,6 +113,7 @@ export default {
       map: null,
       bounds: null,
       markers: [],
+      comment: '',
     };
   },
 
@@ -142,16 +150,22 @@ export default {
       if (!this.annotatedText) {
         return {};
       }
-      let annotationObject = {};
-      annotationObject = Object.assign({"@context": "http://www.w3.org/ns/anno.jsonld"}, annotationObject);
+      let annotationObject = {
+      "@context": "http://www.w3.org/ns/anno.jsonld",
       // annotationObject = Object.assign({"id":1}, annotationObject);
-      annotationObject = Object.assign({"type": "Annotation"}, annotationObject);
-      annotationObject = Object.assign({"created":new Date().toISOString()}, annotationObject);
-      annotationObject = Object.assign({"creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"}}, annotationObject);
-      annotationObject = Object.assign({"generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host}}, annotationObject);
-      annotationObject = Object.assign({"motivation":"tagging"}, annotationObject);
-      annotationObject = Object.assign({"target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname,
-                          "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }}}, annotationObject);
+      "type": "Annotation",
+      "body": {
+        "type": "TextualBody",
+        "value": this.comment,
+        "format": "text/plain"
+      },
+      "created":new Date().toISOString(),
+      "creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"},
+      "generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host},
+      "motivation":"tagging",
+      "target":{"source":window.location.protocol+"//"+window.location.host+window.location.pathname,
+                          "selector":{"type": "TextQuoteSelector","exact": this.annotatedText }},
+      }
       return annotationObject;
     },
 
@@ -161,6 +175,11 @@ export default {
       }
       let annotationObject = {"@context": "http://www.w3.org/ns/anno.jsonld",
       "type": "Annotation",
+      "body": {
+        "type": "TextualBody",
+        "value": this.comment,
+        "format": "text/plain"
+      },
       "created":new Date().toISOString(),
       "creator":{"type":"Human","name":sessionStorage["vue-session-key"]?JSON.parse(sessionStorage["vue-session-key"])["session_username"]:"Anonymous"},
       "generator":{"type":"Software", "name":"TheBeaver", "homepage":window.location.protocol+"//"+window.location.host},
@@ -269,6 +288,27 @@ export default {
       }
     },
 
+    getMemoryDate(date) {
+      let a = '';
+      if (!date.year && date.decade) {
+        a = `${date.decade}s`;
+        return a;
+      }
+
+      if (date.year) {
+        a = date.year;
+      }
+
+      if (date.month && date.year) {
+        a = `${date.month} ${a}`;
+      }
+
+      if (date.day && date.month && date.year) {
+        a = `${date.month} ${date.day}th, ${date.year}`;
+      }
+      return a;
+    },
+
     async annotate() {
 
       this.getTextAnnotation()
@@ -319,7 +359,7 @@ export default {
   grid-template: " thumbnail  title            .          .            " auto
                  " thumbnail  description   description   description  " auto
                  " thumbnail  description   description   description  " auto
-                 " .          .             annotate      annotate     " auto
+                 " .          comment       annotate      annotate     " auto
                  / auto       1fr           auto          auto;
   text-align: left;
 }
@@ -393,5 +433,9 @@ export default {
   margin: 15px;
   grid-area: memory-username;
 }
+.comment {
+  grid-area: comment;
+  padding-bottom: 10px;
+  }
 
 </style>
