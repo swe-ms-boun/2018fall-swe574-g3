@@ -489,12 +489,12 @@ export default {
 .description {
   grid-area: description;
   display: grid;
-  grid-template: "memory-description" 1fr
-                 "memory-username"  1fr
-                 "memory-people"  1fr
-                 "memory-location"  1fr
+  grid-template: "memory-description" auto
+                 "memory-username"  auto
+                 "memory-people"  auto
+                 "memory-location"  auto
                  "map"  256px
-                 "memory-time"  1fr
+                 "memory-time"  auto
                 / auto;
 
 }
