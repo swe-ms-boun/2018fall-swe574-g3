@@ -65,7 +65,11 @@
                       v-model="message"
                       placeholder="Enter your memory..."/>
       </div>
-      <b-button class="postButton" variant="success" v-on:click="postMemory">POST</b-button>
+      <b-button class="postButton"
+                variant="success"
+                v-on:click="postMemory"
+                :disabled="isLoading">{{postButtonName}}
+      </b-button>
     </div>
     <div class="memories">
       <ul class="memoryList" id="memoryList">
@@ -174,7 +178,7 @@ export default {
         { key: '2000s', value: 2000 },
         { key: '2010s', value: 2010 },
       ],
-
+      isLoading: false,
       date: new Date(),
       options: {
         format: 'HH:mm',
@@ -190,6 +194,13 @@ export default {
   },
 
   computed: {
+
+    postButtonName() {
+      if (this.isLoading) {
+        return 'Posting..';
+      }
+      return 'POST';
+    },
 
     memoryDate() {
       return {
@@ -285,7 +296,6 @@ export default {
 
   // Methods here
   methods: {
-
     initMap() {
       this.bounds = new google.maps.LatLngBounds();
       const element = document.getElementById(this.mapName);
@@ -362,6 +372,7 @@ export default {
     },
 
     async postMemory() {
+      this.isLoading = true;
       const locations = [];
       const promise1 = new Promise((resolve, reject) => {
         if (this.coordinates) {
@@ -371,6 +382,7 @@ export default {
               locations.push(a);
             } catch (e) {
               console.log(e);
+              this.isLoading = false;
             }
           });
           setTimeout(resolve, 2000, locations);
@@ -391,9 +403,11 @@ export default {
         })
           .then(async (response) => {
             this.getAllMemories();
+            this.isLoading = false;
           })
           .catch((error) => {
             console.log(error);
+            this.isLoading = false;
           });
       });
     },
