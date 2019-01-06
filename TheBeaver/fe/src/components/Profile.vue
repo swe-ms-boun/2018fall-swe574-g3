@@ -53,6 +53,7 @@
                     {{ option.key }}
             </option>
           </b-form-select>
+          <div class="selectTime"><date-picker :disabled="!dayInt" v-model="timeString" :config="options"></date-picker> </div>
         </div>
         <b-form-textarea class="editDescription"
                       type="text"
@@ -100,6 +101,7 @@
       </ul>
     </div>
   </div>
+  
 </template>
 <script>
 import axios from 'axios';
@@ -107,7 +109,7 @@ import $Scriptjs from 'scriptjs';
 import Vue from 'vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import datePicker from 'vue-bootstrap-datetimepicker';
-// import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
 Vue.use(datePicker);
 
@@ -138,6 +140,7 @@ export default {
       yearsInt: null,
       monthString: null,
       dayInt: null,
+      timeString: null,
       taggedPeople: '',
       // baseURL: 'https://beaver-memories.now.sh',
       baseURL: 'http://localhost:3001',
@@ -166,9 +169,11 @@ export default {
 
       date: new Date(),
       options: {
-        format: 'DD.MM.YYYY',
+        format: 'hh:mm',
         useCurrent: false,
-        viewMode: 'years',
+        //viewMode: 'moment',
+        //keepOpen: true,
+        //inline: true
       },
       components: {
         datePicker,
@@ -184,6 +189,7 @@ export default {
         year: this.yearsInt,
         month: this.monthString,
         day: this.dayInt,
+        time: this.timeString
       };
     },
 
@@ -476,6 +482,11 @@ ul.memoryList li p {
   grid-area: selectDay;
   margin: 15px;
 }
+.selectTime {
+  grid-area: selectTime;
+  margin: 15px;
+  position: relative;
+}
 
 .selectExactDate {
   grid-area: selectExactDate;
@@ -518,8 +529,8 @@ ul.memoryList li p {
 .selectDate {
   grid-area: selectDate;
   display: grid;
-  grid-template: " selectDecade selectYear selectMonth selectDay " auto
-                  /1fr          1fr        1fr         1fr;
+  grid-template: " selectDecade selectYear selectMonth selectDay selectTime" auto
+                  /1fr          1fr        1fr         1fr       1fr;
 }
 
 .editTitle {
