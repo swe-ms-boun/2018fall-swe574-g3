@@ -7,31 +7,32 @@
         <div class="description" @click="clickHandle($event)">
           <Highlighter :searchWords="queries"
                        :textToHighlight="memory.description"
-                       :autoEscape="true">
+                       :autoEscape="true"
+                       class="memory-description">
           </Highlighter>
           <br><br>
           <Highlighter v-if="memory.username"
                        :searchWords="queries"
                        :textToHighlight="'User: ' + memory.username"
-                       :autoEscape="true">
+                       :autoEscape="true"
+                       class="memory-username">
+
           </Highlighter>
           <br>
-          <Highlighter v-if="memory.location"
-                       :searchWords="queries"
-                       :textToHighlight="'Location: ' + memory.location"
-                       :autoEscape="true">
-          </Highlighter>
+          <div class="google-map" :id="mapName"></div>
           <br>
           <Highlighter v-if="memory.taggedPeople"
                        :searchWords="queries"
                        :textToHighlight="'People: ' + memory.taggedPeople"
-                       :autoEscape="true">
+                       :autoEscape="true"
+                       class="memory-people">
           </Highlighter>
           <br>
-          <Highlighter v-if="memory.time"
+          <Highlighter v-if="memory.date"
                        :searchWords="queries"
-                       :textToHighlight="'Time: ' + memory.time"
-                       :autoEscape="true">
+                       :textToHighlight="'Date: ' + getMemoryDate(memory.date)"
+                       :autoEscape="true"
+                       class="memory-time">
           </Highlighter>
           <br>
           <br>
@@ -62,7 +63,6 @@
               v-for="annotation in imageAnnotations"
               :key="annotation.id"
               :position="annotation.rect"
-              v-if="annotation.rect"
             >
             </annotation-rect>
           </memory-img>
@@ -78,6 +78,7 @@
 <script>
 
 import axios from 'axios';
+import $Scriptjs from 'scriptjs';
 import TextHighlight from 'vue-text-highlight';
 import Highlighter from 'vue-highlight-words';
 import MemoryImg from './MemoryImg.vue';
@@ -91,17 +92,21 @@ require('jquery-confirm');
 export default {
   name: 'Memory',
   // Variables here
+  props: ['name'],
+
+  mounted() {
+    $Scriptjs('https://maps.googleapis.com/maps/api/js?key=AIzaSyDizCTlHkRUed4C1f2E1dQxOz2Y93qVBZk', () => {
+      this.initMap();
+    });
+    window.addEventListener('mousemove', this.mouseIsMoving);
+  },
+
   components: {
     MemoryImg,
     AnnotationRect,
     TextHighlight,
     Highlighter,
   },
-
-  mounted() {
-    window.addEventListener('mousemove', this.mouseIsMoving);
-  }, // mounted
-
 
   data() {
     return {
@@ -116,6 +121,10 @@ export default {
       annotationImageRectRatio: {},
       annotationImageRect: {},
       isPhotoLoaded: false,
+      mapName: `${this.name}-map`,
+      map: null,
+      bounds: null,
+      markers: [],
       comment: '',
       clickedText: '',
     };
@@ -131,6 +140,18 @@ export default {
   // Setters here
   watch: {
     /* eslint-disable */
+
+    coordinates() {
+      if (!this.coordinates) { return []; };
+      this.coordinates.forEach((coordinate => {
+        console.log(this.coordinates);
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(coordinate.lat, coordinate.lng),
+            map: this.map
+          });
+          this.markers.push(marker);
+        }).bind(this));
+    }
   },
 
   computed: {
@@ -153,6 +174,10 @@ export default {
 
     imgRatioText() {
       return `${this.annotationImageRectRatio.x},${this.annotationImageRectRatio.y},${this.annotationImageRectRatio.width},${this.annotationImageRectRatio.height}`
+    },
+
+    coordinates() {
+        return this.memory.location;
     },
 
     annotationTextObject() {
@@ -238,6 +263,18 @@ export default {
   // Methods here
   methods: {
 
+    initMap() {
+      this.bounds = new google.maps.LatLngBounds();
+      const element = document.getElementById(this.mapName)
+      let mapCentre = {latitude: 41.015137, longitude: 28.979530}
+      const options = {
+        center: new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude)
+      }
+      const position = new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude);
+      this.map = new google.maps.Map(element, options);
+      this.map.setZoom(10);
+    },
+
     photoLoaded() {
       // setInterval is necessary to ensure browser paints
       // the image, b/c img onload does not take paint into acccount
@@ -261,7 +298,6 @@ export default {
       await axios.get(`${this.annotationURL}/getAnnotations/${window.location.protocol+"//"+window.location.host+window.location.pathname}`)
       .then(res => {
         this.annotations = res.data;
-        console.log(this.annotations);
       })
     },
 
@@ -302,6 +338,27 @@ export default {
       else if (document.selection) {
         this.annotatedText =  document.selection.createRange().text;
       }
+    },
+
+    getMemoryDate(date) {
+      let a = '';
+      if (!date.year && date.decade) {
+        a = `${date.decade}s`;
+        return a;
+      }
+
+      if (date.year) {
+        a = date.year;
+      }
+
+      if (date.month && date.year) {
+        a = `${date.month} ${a}`;
+      }
+
+      if (date.day && date.month && date.year) {
+        a = `${date.month} ${date.day}th, ${date.year}`;
+      }
+      return a;
     },
 
     async annotateText() {
@@ -404,6 +461,17 @@ export default {
                  " comment    comment       annotateText   annotateImage " auto
                  / auto       1fr           auto       auto;
   text-align: left;
+}
+
+.description {
+  grid-area: description;
+  display: grid;
+  grid-template: "memory-description" auto
+                 "memory-username"  auto
+                 "memory-people"  auto
+                 "map"  256px
+                 "memory-time"  auto
+                / auto;
 
 }
 
@@ -446,6 +514,31 @@ export default {
   grid-area: deleteButton;
 }
 
+.google-map {
+  margin: 15px;
+  background: gray;
+  grid-area: map;
+}
+
+.memory-people {
+  margin: 15px;
+  grid-area: memory-people;
+}
+
+.memory-description {
+  margin: 15px;
+  grid-area: memory-description;
+}
+
+.memory-time {
+  margin: 15px;
+  grid-area: memory-time;
+}
+
+.memory-username {
+  margin: 15px;
+  grid-area: memory-username;
+}
 .comment {
   grid-area: comment;
   padding-bottom: 10px;

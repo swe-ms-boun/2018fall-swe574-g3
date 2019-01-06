@@ -1,4 +1,17 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema
+
+  var coordinateSchema = Schema({
+    lat: Number,
+    lng: Number,
+  });
+
+var memoryDateSchema = mongoose.Schema({
+    decade: Number,
+    year: Number,
+    month: String,
+    day: Number,
+});
 
 // Create the schema for the Memory database
 var memorySchema = mongoose.Schema({
@@ -7,9 +20,10 @@ var memorySchema = mongoose.Schema({
     description: String,
     isPublic: Boolean,
     taggedPeople: String,
-    location: String,
+    location: [coordinateSchema],
     time: String,
     imgUrl: String,
+    date: memoryDateSchema,
 });
 
 memorySchema.index({

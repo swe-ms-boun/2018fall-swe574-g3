@@ -18,6 +18,7 @@
     "node-sass": "^4.11.0",
     "pc-bootstrap4-datetimepicker": "^4.17.50",
     "sass-loader": "^7.1.0",
+    "scriptjs": "^2.5.9",
     "serve": "^9.4.0",
     "vue": "^2.5.17",
     "vue-annotator": "^0.13.2",
