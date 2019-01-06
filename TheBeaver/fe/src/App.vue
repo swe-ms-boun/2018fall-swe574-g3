@@ -3,6 +3,7 @@
      <!-- As a heading -->
     <b-navbar class="navbar border-primary border-bottom">
         <img src="./assets/new-logo.png" class="logo" alt="beaver">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
         <div class="links">
           <router-link to="/">Home</router-link> |
           <router-link to="/profile">Post</router-link> |
