@@ -11,6 +11,7 @@ var memoryDateSchema = mongoose.Schema({
     year: Number,
     month: String,
     day: Number,
+    time: String,
 });
 
 // Create the schema for the Memory database
@@ -21,7 +22,6 @@ var memorySchema = mongoose.Schema({
     isPublic: Boolean,
     taggedPeople: String,
     location: [coordinateSchema],
-    time: String,
     imgUrl: String,
     date: memoryDateSchema,
 });

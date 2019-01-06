@@ -388,6 +388,10 @@ export default {
       if (date.day && date.month && date.year) {
         a = `${date.month} ${date.day}th, ${date.year}`;
       }
+
+      if (date.day && date.month && date.year && date.time) {
+        a = `${date.time}, ${date.month} ${date.day}th, ${date.year}`;
+      }
       return a;
     },
 

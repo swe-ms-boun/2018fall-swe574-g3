@@ -53,7 +53,12 @@
                     {{ option.key }}
             </option>
           </b-form-select>
-          <div class="selectTime"><date-picker :disabled="!dayInt" v-model="timeString" :config="options"></date-picker> </div>
+          <div class="selectTime">
+            <date-picker  :disabled="!monthString || !yearsInt || !dayInt"
+                          v-model="timeString"
+                          :config="options">
+            </date-picker>
+          </div>
         </div>
         <b-form-textarea class="editDescription"
                       type="text"
@@ -101,7 +106,7 @@
       </ul>
     </div>
   </div>
-  
+
 </template>
 <script>
 import axios from 'axios';
@@ -169,11 +174,11 @@ export default {
 
       date: new Date(),
       options: {
-        format: 'hh:mm',
+        format: 'HH:mm',
         useCurrent: false,
-        //viewMode: 'moment',
-        //keepOpen: true,
-        //inline: true
+        // viewMode: 'moment',
+        // keepOpen: true,
+        // inline: true
       },
       components: {
         datePicker,
@@ -189,7 +194,7 @@ export default {
         year: this.yearsInt,
         month: this.monthString,
         day: this.dayInt,
-        time: this.timeString
+        time: this.timeString,
       };
     },
 
@@ -345,12 +350,31 @@ export default {
       if (date.day && date.month && date.year) {
         a = `${date.month} ${date.day}th, ${date.year}`;
       }
+
+      if (date.day && date.month && date.year && date.time) {
+        a = `${date.time}, ${date.month} ${date.day}th, ${date.year}`;
+      }
       return a;
     },
 
     async postMemory() {
-      await axios
-        .post(`${this.baseURL}/postMemory`, {
+      const locations = [];
+      const promise1 = new Promise((resolve, reject) => {
+        if (this.coordinates) {
+          this.coordinates.forEach(async (coordinate) => {
+            try {
+              const a = await axios.get(`https://beaver-geocode.now.sh/decode/${coordinate.lat}&${coordinate.lng}`);
+              locations.push(a);
+            } catch (e) {
+              console.log(e);
+            }
+          });
+          setTimeout(resolve, 1000, locations);
+        }
+      });
+      Promise.all([promise1]).then((values) => {
+        console.log(values);
+        axios.post(`${this.baseURL}/postMemory`, {
           description: this.message,
           title: this.title,
           imgUrl: this.imgUrl,
@@ -360,12 +384,13 @@ export default {
           date: this.memoryDate,
           isPublic: true,
         })
-        .then(async (response) => {
-          this.getAllMemories();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+          .then(async (response) => {
+            this.getAllMemories();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
     },
 
     async deleteMemory(id) {

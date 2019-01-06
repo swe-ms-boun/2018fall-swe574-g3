@@ -27,7 +27,16 @@ console.log('wurrkin meh');
 //console.log("https://eu1.locationiq.com/v1/reverse.php?key=fd54c90b1022f7&lat="+req.params.lat+"&lon="+req.params.lng+"&format=json")
 axios.get("https://eu1.locationiq.com/v1/reverse.php?key=fd54c90b1022f7&lat="+req.params.lat+"&lon="+req.params.lng+"&format=json")
   .then(response => {
-    res.jsonp(response.data.address.town+", "+response.data.address.village);
+    let str = '';
+    if (response.data.address.town) {
+      str += response.data.address.town;
+    }
+
+    if(response.data.address.village) {
+      str += ', ';
+      str += response.data.address.village;
+    }
+    res.jsonp(str);
   })
   .catch(error => {
     console.log(error);
