@@ -67,7 +67,10 @@ export default {
         this.endX = offsetX;
         this.endY = offsetY;
         this.updateRect();
+        return;
       }
+      const { offsetX, offsetY } = event;
+      this.emitHover(offsetX, offsetY);
     },
     mouseupHandler(event) {
       const { offsetX, offsetY } = event;
@@ -79,6 +82,17 @@ export default {
 
     updateRect() {
       this.$emit('anno-rect-changed', this.annotationRectangle);
+    },
+
+    emitHover(offsetX, offsetY) {
+      const boundingRect = this.$refs.image.getBoundingClientRect();
+      const imageHeight = boundingRect.height;
+      const imageWidth = boundingRect.width;
+      const relativePos = {
+        xPosition: (offsetX / imageWidth),
+        yPosition: (offsetY / imageHeight),
+      };
+      this.$emit('anno-rect-hover', relativePos);
     },
   },
 

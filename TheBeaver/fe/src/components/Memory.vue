@@ -43,7 +43,8 @@
           placeholder="Enter your annotation..."
         />
         <div class="thumbnail">
-          <memory-img @anno-rect-changed="annoRectChanged"
+          <memory-img @anno-rect-hover="isInAnnoRect"
+                      @anno-rect-changed="annoRectChanged"
                       @photo-loaded="photoLoaded"
                       v-if="memory.imgUrl"
                       :img-url="memory.imgUrl"
@@ -94,7 +95,6 @@ export default {
     $Scriptjs('https://maps.googleapis.com/maps/api/js?key=AIzaSyDizCTlHkRUed4C1f2E1dQxOz2Y93qVBZk', () => {
       this.initMap();
     });
-    window.addEventListener('mousemove', this.mouseIsMoving);
   },
 
   components: {
@@ -123,6 +123,7 @@ export default {
       markers: [],
       comment: '',
       clickedText: '',
+      imageComments: [],
     };
   },
 
@@ -153,6 +154,9 @@ export default {
   computed: {
 
     comments() {
+      if (this.imageComments && this.imageComments.length !== 0) {
+        return this.imageComments;
+      }
       if (!this.clickedText || !this.textAnnotations) {return;};
       console.log("Clicked: " + this.clickedText);
       this.textAnnotations.forEach(anno => {
@@ -236,7 +240,7 @@ export default {
                     !this.$refs.memoryImage ||
                     !annotation.target.id ||
                     !annotation.target.id.includes('#xywh=')) {
-                      return annotation
+                      return null;
                 };
                 const { width: imageWidth, height: imageHeight} = this.$refs.memoryImage.$refs.image.getBoundingClientRect();
                 return {
@@ -248,6 +252,20 @@ export default {
                   })
                 }
               })
+    },
+
+    imageAnnotationsRaw() {
+       return this.annotations
+              .filter(annotation => annotation.target.type === 'Image')
+              .map(annotation => {
+                if (!this.isPhotoLoaded ||
+                    !this.$refs.memoryImage ||
+                    !annotation.target.id ||
+                    !annotation.target.id.includes('#xywh=')) {
+                      return null;
+                };
+                return annotation;
+              });
     },
 
     queries() {
@@ -326,6 +344,22 @@ export default {
       });
     },
 
+    isInAnnoRect(relPos) {
+      if(!this.isPhotoLoaded || !this) {return;};
+      let commentArray = [];
+      this.imageAnnotationsRaw.forEach(annotation => {
+        const rectangle = this.rect(annotation);
+        const{x: x, y: y, width: width, height: height} = rectangle
+        if (( relPos.xPosition > x &&
+              relPos.xPosition < Number(x) + Number(width)) &&
+              (relPos.yPosition > y &&
+              relPos.yPosition < ( Number(y)+ Number(height)))) {
+               commentArray.push(annotation.body.value);
+            }
+      });
+      this.imageComments = commentArray;
+    },
+
     getTextAnnotation() {
       if (window.getSelection) {
         if (window.getSelection().toString() === ' ') { return; };
@@ -384,33 +418,27 @@ export default {
       await this.getAnnotations();
     },
 
-    mouseIsMoving(e) {
-      const x = e.pageX;
-      const y = e.pageY;
-      //console.log(x, y);
-    },
-
     clickHandle(e) {
-      let s = window.getSelection();
-      var range = s.getRangeAt(0);
-      var node = s.anchorNode;
+      try {
+        let s = window.getSelection();
+        var range = s.getRangeAt(0);
+        var node = s.anchorNode;
 
-      while (range.toString().indexOf(' ') != 0 && range.startOffset != 0) {
-          range.setStart(node, (range.startOffset - 1));
+        while (range.toString().indexOf(' ') != 0 && range.startOffset != 0) {
+            range.setStart(node, (range.startOffset - 1));
+        }
+        range.setStart(node, range.startOffset + 1);
+
+        do {
+            range.setEnd(node, range.endOffset + 1);
+        } while (range.toString().indexOf(' ') == -1 && range.toString().trim() != '' && range.endOffset < range.endContainer.length);
+
+        var str = range.toString().trim();
+        this.clickedText = str;
+      } catch (error) {
+
       }
-      range.setStart(node, range.startOffset + 1);
-
-      do {
-          range.setEnd(node, range.endOffset + 1);
-      } while (range.toString().indexOf(' ') == -1 && range.toString().trim() != '' && range.endOffset < range.endContainer.length);
-
-      var str = range.toString().trim();
-      this.clickedText = str;
     }
-  },
-
-  destroyed() {
-    window.removeEventListener('mousemove', this.mouseIsMoving);
   },
 
 }
