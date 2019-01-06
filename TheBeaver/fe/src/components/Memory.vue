@@ -12,7 +12,7 @@
           </Highlighter>
           <Highlighter v-if="memory.username"
                        :searchWords="queries"
-                       :textToHighlight="'User: ' + memory.username"
+                       :textToHighlight="'Author: ' + memory.username"
                        :autoEscape="true"
                        class="memory-username">
           </Highlighter>
@@ -68,7 +68,8 @@
       <h2>Annotations</h2>
       <ul class="comments" id="comments">
         <li v-for="comment in comments" :key="comment">
-          <p>{{comment}}</p>
+          <p>{{comment.author}}:</p>
+          <p>{{comment.comment}}</p>
         </li>
       </ul>
     </div>
@@ -168,7 +169,7 @@ export default {
       try {
       var a = this.textAnnotations
                 .filter(annotation => annotation.target.selector.exact.includes(this.clickedText))
-                .map(annotation => annotation.body.value)
+                .map(annotation => { return {comment: annotation.body.value, author: annotation.creator.name} });
       } catch (e) {
         console.log(e);
       }
@@ -365,7 +366,7 @@ export default {
               relPos.xPosition < Number(x) + Number(width)) &&
               (relPos.yPosition > y &&
               relPos.yPosition < ( Number(y)+ Number(height)))) {
-               commentArray.push(annotation.body.value);
+               commentArray.push( { comment: annotation.body.value, author: annotation.creator.name});
             }
       });
       this.imageComments = commentArray;

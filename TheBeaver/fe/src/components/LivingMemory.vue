@@ -18,7 +18,7 @@
             <br>
             <br>
             <div v-if="memory.username">
-              User: {{ memory.username }}
+              Author: {{ memory.username }}
             </div>
             <div v-if="memory.taggedPeople">
               People: {{ memory.taggedPeople }}
@@ -54,8 +54,7 @@ export default {
     return {
       memories: [],
       searchedKeyword: '',
-      // baseURL: 'https://beaver-memories.now.sh',
-      baseURL: 'http://localhost:3001',
+      baseURL: 'https://beaver-memories.now.sh',
     };
   },
 
