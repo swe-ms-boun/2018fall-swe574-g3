@@ -152,7 +152,8 @@ export default {
           });
           this.markers.push(marker);
         }).bind(this));
-    }
+      this.centerMap();
+    },
   },
 
   computed: {
@@ -284,11 +285,20 @@ export default {
       const element = document.getElementById(this.mapName)
       let mapCentre = {latitude: 41.015137, longitude: 28.979530}
       const options = {
-        center: new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude)
+        center: new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude),
+        maxZoom: 15,
       }
       const position = new google.maps.LatLng(mapCentre.latitude, mapCentre.longitude);
       this.map = new google.maps.Map(element, options);
       this.map.setZoom(10);
+    },
+
+    centerMap() {
+      const bounds = new google.maps.LatLngBounds();
+      this.markers.forEach((coord) => {
+        const position = new google.maps.LatLng(coord.position.lat(), coord.position.lng());
+        this.map.fitBounds(bounds.extend(position))
+      });
     },
 
     photoLoaded() {
