@@ -10,7 +10,6 @@
                        :autoEscape="true"
                        class="memory-description">
           </Highlighter>
-          <br><br>
           <Highlighter v-if="memory.username"
                        :searchWords="queries"
                        :textToHighlight="'User: ' + memory.username"
@@ -18,33 +17,24 @@
                        class="memory-username">
 
           </Highlighter>
-          <br>
           <div class="google-map" :id="mapName"></div>
-          <br>
           <Highlighter v-if="memory.taggedPeople"
                        :searchWords="queries"
                        :textToHighlight="'People: ' + memory.taggedPeople"
                        :autoEscape="true"
                        class="memory-people">
           </Highlighter>
-          <br>
           <Highlighter v-if="memory.date"
                        :searchWords="queries"
                        :textToHighlight="'Date: ' + getMemoryDate(memory.date)"
                        :autoEscape="true"
                        class="memory-time">
           </Highlighter>
-          <br>
-          <br>
         </div>
         <!-- </p> -->
-        <b-button class="annotateText"
+        <b-button class="annotate"
                 variant="info"
-                @click="annotateText()">Annotate Text
-        </b-button>
-        <b-button class="annotateImage"
-                variant="info"
-                @click="annotateImage()">Annotate Image
+                @click="annotate()">Annotate
         </b-button>
          <b-form-textarea
           class="comment"
@@ -62,17 +52,23 @@
             <annotation-rect
               v-for="annotation in imageAnnotations"
               :key="annotation.id"
-              :position="annotation.rect"
-            >
+              :position="annotation.rect">
             </annotation-rect>
           </memory-img>
         </div>
         <br>
     </div>
+    <div class="annotationComments">
+      <h2>Annotations</h2>
+      <ul class="comments" id="comments">
+        <li v-for="comment in comments" :key="comment">
+          <p>{{comment}}</p>
+        </li>
+      </ul>
+    </div>
     <!-- <pre id="annot">{"type": "TextQuoteSelector","exact": "{{ annotatedText }}"}</pre> -->
     <pre id="debug" style="display:none">{{ annotationTextObject }}</pre>
   </div>
-  <p>{{comments}}</p>
 </div>
 </template>
 <script>
@@ -361,7 +357,7 @@ export default {
       return a;
     },
 
-    async annotateText() {
+    async annotate() {
 
       this.getTextAnnotation()
       if (this.annotationTextObject) {
@@ -373,12 +369,6 @@ export default {
             }
           });
       }
-
-      await this.getAnnotations();
-
-    },
-
-    async annotateImage() {
 
       if (this.annotationImageObject) {
         let annotationObject = this.annotationImageObject;
@@ -447,9 +437,9 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
-  grid-template:  " .     .           . "  10%
-                  " .     memoryCell  . "  auto
-                  / 13%   1fr         13%;
+  grid-template:  " .     .           .           "  10%
+                  " .     memoryCell  annotations "  auto
+                  / 5%   1fr         256px;
 }
 
 .memoryCell {
@@ -458,7 +448,7 @@ export default {
   grid-template: " thumbnail  .             .              .             " auto
                  " thumbnail  title         title          title         " auto
                  " thumbnail  description   description    description   " auto
-                 " comment    comment       annotateText   annotateImage " auto
+                 " comment    comment       annotate       annotate      " auto
                  / auto       1fr           auto       auto;
   text-align: left;
 }
@@ -466,11 +456,11 @@ export default {
 .description {
   grid-area: description;
   display: grid;
-  grid-template: "memory-description" auto
-                 "memory-username"  auto
-                 "memory-people"  auto
+  grid-template: "memory-description" 1fr
+                 "memory-username"  1fr
+                 "memory-people"  1fr
                  "map"  256px
-                 "memory-time"  auto
+                 "memory-time"  1fr
                 / auto;
 
 }
@@ -491,6 +481,7 @@ export default {
 .title {
   grid-area: title;
   font-weight: bold;
+  margin: 15px;
 }
 
 .description {
@@ -498,16 +489,10 @@ export default {
   margin-top: 10px;
 }
 
-.annotateText {
-  grid-area: annotateText;
-  padding-bottom: 10px;
-  margin: 10px;
-}
-
-.annotateImage {
-  grid-area: annotateImage;
-  padding-bottom: 10px;
-    margin: 10px;
+.annotate {
+  grid-area: annotate;
+  padding-bottom: 15px;
+  margin: 15px;
 }
 
 .deleteButton {
@@ -541,7 +526,16 @@ export default {
 }
 .comment {
   grid-area: comment;
-  padding-bottom: 10px;
-  }
+  padding-bottom: 15px;
+  margin: 15px;
+}
+
+.annotationComments {
+  grid-area: annotations;
+  margin: 15px;
+  align-self: start;
+}
+
+
 
 </style>
