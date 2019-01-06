@@ -312,7 +312,14 @@ export default {
         const marker = new google.maps.Marker({
           position: latlng,
           map: this.map,
+          draggable: true,
         });
+        marker.addListener('click', ((e) => {
+          const index = this.markers.map(x => x.position.lat())
+            .indexOf(marker.position.lat());
+          this.markers[index].setMap(null);
+          this.markers.splice(index, 1);
+        }));
         this.markers.push(marker);
       }));
     },
