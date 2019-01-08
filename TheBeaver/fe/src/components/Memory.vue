@@ -134,7 +134,7 @@ export default {
   // On Create here
   async created() {
     this.id = this.$attrs.id;
-    this.getMemory();
+    await this.getMemory();
     this.getAnnotations();
   },
 
@@ -320,8 +320,9 @@ export default {
     },
 
     async getAnnotations() {
-      await axios.get(`${this.annotationURL}/getAnnotations/${window.location.protocol+"//"+window.location.host+window.location.pathname}`)
+      await axios.get(`${this.annotationURL}/getAnnotations/${window.location.host+window.location.pathname}`)
       .then(res => {
+        console.log(res.data);
         this.annotations = res.data;
       })
     },
